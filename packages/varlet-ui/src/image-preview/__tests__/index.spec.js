@@ -1,8 +1,8 @@
-import ImagePreview from '../index'
-import VarImagePreview from '../ImagePreview.vue'
 import { createApp } from 'vue'
+import { expect, test, vi } from 'vitest'
 import { delay, trigger, triggerDrag } from '../../utils/test'
-import { expect, vi, test } from 'vitest'
+import VarImagePreview from '../ImagePreview.vue'
+import ImagePreview from '../index'
 
 test('test image preview plugin', () => {
   const app = createApp({}).use(ImagePreview)
@@ -41,7 +41,7 @@ test('test image preview onChange callback', async () => {
   const onChange = vi.fn()
 
   ImagePreview({
-    images: ['https://varlet.gitee.io/varlet-ui/cat.jpg', 'https://varlet.gitee.io/varlet-ui/cat2.jpg'],
+    images: ['https://varletjs.org/varlet/cat.jpg', 'https://varletjs.org/varlet/cat2.jpg'],
     onChange,
   })
   await delay(200)
@@ -86,7 +86,7 @@ test('test image preview setDefaultOptions and resetDefaultOptions', async () =>
 
 test('test image preview imagePreventDefault', async () => {
   ImagePreview({
-    images: ['https://varlet.gitee.io/varlet-ui/cat.jpg'],
+    images: ['https://varletjs.org/varlet/cat.jpg'],
     imagePreventDefault: true,
   })
 
@@ -100,7 +100,7 @@ test('test image preview onLongPress callback', async () => {
   const onLongPress = vi.fn()
 
   ImagePreview({
-    images: ['https://varlet.gitee.io/varlet-ui/cat.jpg'],
+    images: ['https://varletjs.org/varlet/cat.jpg'],
     onLongPress,
   })
 
@@ -116,7 +116,7 @@ test('test image preview onLongPress callback', async () => {
 
 test('test image preview initialIndex', async () => {
   ImagePreview({
-    images: ['https://varlet.gitee.io/varlet-ui/cat.jpg', 'https://varlet.gitee.io/varlet-ui/cat2.jpg'],
+    images: ['https://varletjs.org/varlet/cat.jpg', 'https://varletjs.org/varlet/cat2.jpg'],
     initialIndex: 1,
   })
 

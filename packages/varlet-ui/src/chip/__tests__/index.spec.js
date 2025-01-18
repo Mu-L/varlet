@@ -1,8 +1,8 @@
+import { createApp } from 'vue'
+import { mount } from '@vue/test-utils'
+import { describe, expect, test, vi } from 'vitest'
 import Chip from '..'
 import VarChip from '../Chip'
-import { mount } from '@vue/test-utils'
-import { createApp } from 'vue'
-import { expect, vi, test, describe } from 'vitest'
 
 test('test chip plugin', () => {
   const app = createApp({}).use(Chip)
@@ -60,6 +60,25 @@ describe('test chip component props', () => {
     expect(wrapper.find('.var-chip__plain').exists()).toBe(true)
     await wrapper.setProps({ plain: false })
     expect(wrapper.find('.var-chip__plain').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  test('test chip elevation', async () => {
+    const wrapper = mount(VarChip)
+
+    expect(wrapper.find('.var-elevation--1').exists()).toBe(false)
+
+    await wrapper.setProps({
+      elevation: true,
+    })
+
+    expect(wrapper.find('.var-elevation--1').exists()).toBe(true)
+
+    await wrapper.setProps({
+      elevation: 3,
+    })
+    expect(wrapper.find('.var-elevation--3').exists()).toBe(true)
+
     wrapper.unmount()
   })
 

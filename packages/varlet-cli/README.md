@@ -45,8 +45,10 @@ Also refer to `@varlet/ui` [varlet.config.mjs](https://github.com/varletjs/varle
 | `namespace` | Component library namespace, will be used as component prefix | _string_ | `var` |
 | `host` | Development server host | _number_ | `localhost` |
 | `port` | Development server port | _number_ | `8080` |
+| `proxy` | Development server proxy | _Record<string, string \| ProxyOptions>_ | `-` |
 | `title` | The title of the component library in the document | _string_ | `VARLET` |
 | `logo` | The logo of the component library in the document | _string_ | `-` |
+| `alias` | Path alias (root is src folder when use relative path) | _Record<string, string>_ | `-` |
 | `defaultLanguage` | Document default language | _string_ | `zh-CN` |
 | `defaultLightTheme` | The default light theme | _string_ | `md3LightTheme` |
 | `defaultDarkTheme` | The default dark theme | _string_ | `md3DarkTheme` |
@@ -58,12 +60,15 @@ Also refer to `@varlet/ui` [varlet.config.mjs](https://github.com/varletjs/varle
 | `md3DarkTheme` | md3 dark mode document theme | _Record<string, any>_ | `-` |
 | `highlight` | Document code snippet style related | _{ style: string }_ | `-` |
 | `analysis` | Document statistics related | _{ baidu: string }_ | `-` |
-| `pc` | PC side document structure configuration | _Record<string, any>_ | `-` |
-| `mobile` | Mobile document structure configuration | _Record<string, any>_ | `-` |
+| `pc` | PC side document structure configuration | _[VarletConfigPc](https://github.com/varletjs/varlet/blob/dev/packages/varlet-cli/src/node/config/varlet.config.ts)_ | `-` |
+| `mobile` | Mobile document structure configuration | _[VarletConfigMobile](https://github.com/varletjs/varlet/blob/dev/packages/varlet-cli/src/node/config/varlet.config.ts)_ | `-` |
+| `bundle` | Bundle output options | _{ external: string[], globals: Record<string, string> }_ | `-` |
+| `vitePlugins` | vite plugins | _[Plugin](https://vite.dev/guide/using-plugins.html)[]_ \| `(plugins: Plugin[]) => Plugin[])` | `-` |
 | `directives` | Component library directive folder name | _string[]_ | `[]` |
 | `copy` | Copy file configuration | _[CopyPath[]](https://github.com/varletjs/varlet/blob/dev/packages/varlet-vite-plugins/src/copy.ts)_ | `- ` |
 | `icons` | Font icon packaging related configurations | _[VarletConfigIcons](https://github.com/varletjs/varlet/blob/dev/packages/varlet-cli/src/node/config/varlet.config.ts) _ | `-` |
 | `esbuild` | esbuild configuration | _[VarletConfigEsbuild](https://github.com/varletjs/varlet/blob/dev/packages/varlet-cli/src/node/config/varlet.config.ts)_ | ` -` |
+| `seo` | seo options | _[VarletConfigSeo](https://github.com/varletjs/varlet/blob/dev/packages/varlet-cli/src/node/config/varlet.config.ts)_ | ` -` |
 
 #### Menu
 
@@ -134,6 +139,8 @@ varlet-cli build
 ```shell
 # playground-ignore
 varlet-cli preview
+# set port number
+varlet-cli preview -p <port>
 ```
 
 #### Compile component library
@@ -179,6 +186,13 @@ varlet-cli build:icons
 varlet-cli test
 ```
 
+#### Execute a unit test
+
+```shell
+# playground-ignore
+varlet-cli test -c <componentName>
+```
+
 #### Execute unit tests in watch mode
 
 ```shell
@@ -191,13 +205,6 @@ varlet-cli test -w
 ```shell
 # playground-ignore
 varlet-cli test -cov
-```
-
-#### Lint the code
-
-```shell
-# playground-ignore
-varlet-cli lint
 ```
 
 #### Lint git commit message
@@ -272,8 +279,8 @@ varlet-cli create
 
 ### Note before publish
 
-- 1.`npm` repository registry must set to `npm` official mirror
-- 2.Execute `npm login` to log in
+1. `npm` repository registry must set to `npm` official mirror
+2. Execute `npm login` to log in
 
 ### Q & A
 

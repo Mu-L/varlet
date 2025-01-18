@@ -1,11 +1,11 @@
+import { createApp } from 'vue'
+import { mount } from '@vue/test-utils'
+import { describe, expect, test, vi } from 'vitest'
 import Swipe from '..'
 import SwipeItem from '../../swipe-item'
-import VarSwipe from '../Swipe'
 import VarSwipeItem from '../../swipe-item/SwipeItem'
-import { mount } from '@vue/test-utils'
-import { createApp } from 'vue'
-import { delay, mockOffset, triggerDrag } from '../../utils/test'
-import { expect, vi, test, describe } from 'vitest'
+import { delay, mockOffset, trigger, triggerDrag, triggerKeyboard } from '../../utils/test'
+import VarSwipe from '../Swipe'
 
 mockOffset()
 
@@ -72,6 +72,44 @@ test('test swipe next & prev & to method', async () => {
   expect(onChange).toHaveBeenLastCalledWith(2)
   await delay(100)
   expect(wrapper.findAll('.var-swipe__indicator')[2].classes()).toContain('var-swipe--indicator-active')
+
+  wrapper.unmount()
+})
+
+test('test swipe keyboard Arrow', async () => {
+  const wrapper = mount({
+    components: {
+      [VarSwipe.name]: VarSwipe,
+      [VarSwipeItem.name]: VarSwipeItem,
+    },
+    template: `
+      <var-swipe>
+        <var-swipe-item>1</var-swipe-item>
+        <var-swipe-item>2</var-swipe-item>
+      </var-swipe>
+    `,
+  })
+
+  const children = wrapper.findAllComponents({ name: 'var-swipe-item' })
+  await trigger(children[0].find('.var-swipe-item'), 'focus')
+
+  await triggerKeyboard(window, 'keydown', { key: 'ArrowRight' })
+  await trigger(children[0].find('.var-swipe-item'), 'blur')
+  await trigger(children[1].find('.var-swipe-item'), 'focus')
+
+  await triggerKeyboard(window, 'keydown', { key: 'ArrowRight' })
+  await delay(300)
+  await trigger(children[0].find('.var-swipe-item'), 'focus')
+  await trigger(children[1].find('.var-swipe-item'), 'blur')
+
+  await triggerKeyboard(window, 'keydown', { key: 'ArrowLeft' })
+  await trigger(children[0].find('.var-swipe-item'), 'blur')
+  await trigger(children[1].find('.var-swipe-item'), 'focus')
+
+  await triggerKeyboard(window, 'keydown', { key: 'ArrowLeft' })
+  await delay(300)
+  await trigger(children[0].find('.var-swipe-item'), 'focus')
+  await trigger(children[1].find('.var-swipe-item'), 'blur')
 
   wrapper.unmount()
 })
@@ -205,10 +243,14 @@ describe('test swipe component props', () => {
       },
     })
 
+    await delay(600)
     expect(wrapper.html()).toMatchSnapshot()
+
     await wrapper.setProps({ vertical: false })
-    expect(wrapper.html()).toMatchSnapshot()
+    await delay(600)
     expect(wrapper.find('.var-swipe__navigation').exists()).toBe(true)
+    expect(wrapper.html()).toMatchSnapshot()
+
     await wrapper.setProps({ navigation: false })
     expect(wrapper.find('.var-swipe__navigation').exists()).toBe(false)
     expect(wrapper.html()).toMatchSnapshot()

@@ -58,9 +58,10 @@ program
 program
     .command('preview')
     .description('Preview varlet site for production')
-    .action(async () => {
+    .option('-p, --port <port>', 'port number')
+    .action(async (options) => {
     const { preview } = await import('./commands/preview.js');
-    return preview();
+    return preview(options);
 });
 program
     .command('compile')
@@ -75,13 +76,6 @@ program
     .action(async () => {
     const { styleVars } = await import('./commands/styleVars.js');
     return styleVars();
-});
-program
-    .command('lint')
-    .description('Lint code')
-    .action(async () => {
-    const { lint } = await import('./commands/lint.js');
-    return lint();
 });
 program
     .command('create')

@@ -34,7 +34,7 @@ Display content and actions about a single subject.
   <var-card 
     title="Dangerous" 
     subtitle="The girl was dangerous" 
-    src="https://varlet.gitee.io/varlet-ui/cat.jpg"
+    src="https://varletjs.org/cat.jpg"
     description="The way she came into the place I knew right then and there.There was something different about this girl.The way she moved her hair her face her lines.Divinity in motion as she stalked the room.I could feel the aura of her presence.Every head turned feeling passion and lust.The girl was persuasive the girl I could not trust.The girl was bad.The girl was dangerous."
   />
 </template>
@@ -48,7 +48,7 @@ Display content and actions about a single subject.
     title="Dangerous"
     subtitle="The girl was dangerous"
     description="The way she came into the place I knew right then and there.There was something different about this girl.The way she moved her hair her face her lines.Divinity in motion as she stalked the room.I could feel the aura of her presence.Every head turned feeling passion and lust.The girl was persuasive the girl I could not trust.The girl was bad.The girl was dangerous."
-    src="https://varlet.gitee.io/varlet-ui/cat.jpg"
+    src="https://varletjs.org/cat.jpg"
   >
     <template #extra>
       <var-space>
@@ -67,7 +67,7 @@ Display content and actions about a single subject.
   <var-card
     title="Dangerous"
     subtitle="The way she came into the place I knew right then and there.There was something different about this girl.The way she moved her hair her face her lines.Divinity in motion as she stalked the room.I could feel the aura of her presence.Every head turned feeling passion and lust.The girl was persuasive the girl I could not trust.The girl was bad.The girl was dangerous."
-    src="https://varlet.gitee.io/varlet-ui/cat.jpg"
+    src="https://varletjs.org/cat.jpg"
     layout="row"
   >
     <template #extra>
@@ -108,7 +108,7 @@ const floating = ref(false)
   <var-card
     title="Dangerous"
     subtitle="The girl was dangerous"
-    src="https://varlet.gitee.io/varlet-ui/cat.jpg"
+    src="https://varletjs.org/cat.jpg"
     v-model:floating="floating"
   >
     <template #extra>
@@ -134,13 +134,25 @@ const floating = ref(false)
 </style>
 ```
 
-### Outline
+### Outlined
 
 ```html
 <template>
   <var-card
-    outline
-    :elevation="0"
+    variant="outlined"
+    title="Dangerous"
+    subtitle="The girl was dangerous"
+    description="The way she came into the place I knew right then and there.There was something different about this girl.The way she moved her hair her face her lines.Divinity in motion as she stalked the room.I could feel the aura of her presence.Every head turned feeling passion and lust.The girl was persuasive the girl I could not trust.The girl was bad.The girl was dangerous."
+  />
+</template>
+```
+
+### Filled
+
+```html
+<template>
+  <var-card
+    variant="filled"
     title="Dangerous"
     subtitle="The girl was dangerous"
     description="The way she came into the place I knew right then and there.There was something different about this girl.The way she moved her hair her face her lines.Divinity in motion as she stalked the room.I could feel the aura of her presence.Every head turned feeling passion and lust.The girl was persuasive the girl I could not trust.The girl was bad.The girl was dangerous."
@@ -154,10 +166,11 @@ const floating = ref(false)
 
 | Prop                | Description                                                     | Type     | Default  |
 |---------------------|-----------------------------------------------------------------|----------|----------|
+| `variant`  ***3.5.4***    | The variant of Card, optional value is `standard` `outlined` `filled`            | _string_ | `standard`      |
 | `title`             | The title of Card                                               | _string_ | `-`      |
 | `subtitle`          | The subtitle of Card                                            | _string_ | `-`      |
 | `description`       | The description of Card                                         | _string_ | `-`      |
- `elevation` | Elevation level, options `true` `false` and level of `0-24` | _string \| number \| boolean_|   `true`    |
+| `elevation` | Elevation level, options `true` `false` and level of `0-24` | _string \| number \| boolean_|   `true`    |
 | `src`               | The src of Image                                                | _string_ | `-`      |
 | `layout`            | Arrangement mode, options `row` `column`                        | _string_ | `column` |
 | `fit`               | Fill mode, options `fill` `contain` `cover` `none` `scale-down` | _string_ | `cover`  |
@@ -166,7 +179,7 @@ const floating = ref(false)
 | `image-height`      | Height of Image                                                 | _string \| number_  | `-`     |
 | `image-width`       | Width of Image                                                  | _string \| number_  | `-`     |
 | `ripple`            | Whether to enable ripple                                        | _boolean_ | `false`  |
-| `floating`          | Whether to full screen                                         | _boolean_ | `false`  |
+| `v-model:floating`          | Whether to full screen                                         | _boolean_ | `false`  |
 | `floating-duration` | Time to full screen(ms)                                         | _number_ | `250`    |
 
 ### Events
@@ -180,9 +193,10 @@ const floating = ref(false)
 | Name | Description | SlotProps |
 |-----------------|---------------------------------| --------- |
 | `image`         | Custom image                    | `-`       |
-| `title`         | Custom title                    | `-`       |
-| `subtitle`      | Custom subtitle                 | `-`       |
-| `description`   | Custom description              | `-`       |
+| `default` ***3.3.7***    | Custom content                  | `-`       |
+| `title`         | Custom title                    | `slotClass: string`  title class   |
+| `subtitle`      | Custom subtitle                 | `slotClass: string` subtitle class   |
+| `description`   | Custom description              | `slotClass: string` description class   |
 | `floating-content`     | Content displayed when floating | `-`  |
 | `extra`         | Custom bottom content           | `-`       |
 | `close-button`  | Custom close button             | `-`  |
@@ -194,6 +208,7 @@ Here are the CSS variables used by the component. Styles can be customized using
 | Variable                            | Default               |
 |-------------------------------------|-----------------------|
 | `--card-background`                 | `var(--color-surface-container-highest)`                |
+| `--card-filled-background`          | `hsla(0, 0%, 93%, 1)` |
 | `--card-padding`                    | `0px 0 15px 0`        |
 | `--card-border-radius`              | `4px`                 |
 | `--card-outline-color`              | `var(--color-outline)` |
@@ -206,6 +221,11 @@ Here are the CSS variables used by the component. Styles can be customized using
 | `--card-title-padding`              | `0 12px`              |
 | `--card-title-margin`               | `15px 0 0 0`          |
 | `--card-title-row-margin`           | `12px 0`              |
+| `--card-content-padding`            | `0 16px`             |
+| `--card-content-margin`             | `16px 0 0 0`         |
+| `--card-content-color`              | `var(--color-on-surface-variant)`|
+| `--card-content-font-size`          | `14px`               |
+| `--card-content-row-margin`         | `16px 0 0 0`         |
 | `--card-subtitle-color`             | `rgba(0, 0, 0, 0.6)`  |
 | `--card-subtitle-font-size`         | `14px`                |
 | `--card-subtitle-padding`           | `0 13px`              |

@@ -162,6 +162,32 @@ async function picker() {
 </template>
 ```
 
+### 列数量
+
+通过 `columnsCount` 设置最大显示列的数量，在级联模式下十分有用。
+
+```html
+<script setup>
+import { Picker, Snackbar } from '@varlet/ui'
+import columns from '@varlet/ui/json/area.json'
+
+async function picker() {
+  const { state, texts, indexes } = await Picker({
+    cascade: true,
+    columns,
+    columnsCount: 2,
+    onChange(values, indexes) {
+      Snackbar(`values: ${values.toString()}, indexes: ${indexes.toString()}`)
+    },
+  })
+}
+</script>
+
+<template>
+  <var-button type="primary" block @click="picker">配置显示列</var-button>
+</template>
+```
+
 ### 值映射
 
 ```html
@@ -344,6 +370,26 @@ function handleChange(values, indexes) {
 </template>
 ```
 
+### 列数量
+
+```html
+<script setup>
+import { ref } from 'vue'
+import { Snackbar } from '@varlet/ui'
+import area from '@varlet/ui/json/area.json'
+
+const columns = ref(area)
+
+function handleChange(values, indexes) {
+  Snackbar(`values: ${values.toString()}, indexes: ${indexes.toString()}`)
+}
+</script>
+
+<template>
+  <var-picker cascade :columns="columns" :columns-count="2" @change="handleChange" />
+</template>
+```
+
 ### 值的映射
 
 ```html
@@ -447,6 +493,7 @@ function handleChange(values, indexes) {
 | `cascade` | 是否开启级联模式 | _boolean_ | `true` |
 | `option-height` | 选项的高度(px rem) | _string \| number_ | `44` |
 | `option-count` | 可见的选项个数 | _string \| number_ | `6` |
+| `columns-count`  ***3.3.11*** | 最大显示列数 | _string \| number_ | `-` |
 | `confirm-button-text` | 确认按钮文字 | _string_ | `确认` |
 | `cancel-button-text` | 取消按钮文字 | _string_ | `取消` |
 | `confirm-button-text-color` | 确认按钮文字颜色 | _string_ | `-` |
@@ -466,6 +513,7 @@ function handleChange(values, indexes) {
 | `cascade`                | 是否开启级联模式 | _boolean_ | `true` |
 | `optionHeight`           | 选项的高度 | _string \| number_ | `44` |
 | `optionCount`            | 可见的选项个数 | _string \| number_ | `6` |
+| `columnsCount`  ***3.3.11***   | 最大显示列数 | _string \| number_ | `-` |
 | `confirmButtonText`      | 确认按钮文字 | _string_ | `确认` |
 | `cancelButtonText`       | 取消按钮文字 | _string_ | `取消` |
 | `confirmButtonTextColor` | 确认按钮文字颜色 | _string_ | `-` |

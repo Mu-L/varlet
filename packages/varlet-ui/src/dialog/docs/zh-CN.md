@@ -137,9 +137,9 @@ const show = ref(false)
     title="兰亭序"
     message="兰亭临帖 行书如行云流水"
     v-model:show="show"
-    @confirm="() => Snackbar.success('confirm')"
-    @cancel="() => Snackbar.error('cancel')"
-    @closed="() => Snackbar.info('closed')"
+    @confirm="Snackbar.success('confirm')"
+    @cancel="Snackbar.error('cancel')"
+    @closed="Snackbar.info('closed')"
   />
 </template>
 ```
@@ -297,6 +297,7 @@ const show = ref(false)
 | --- | --- | --- |
 | `default` | 对话框主要内容 | `-` |
 | `title` | 对话框标题 | `-` |
+| `actions` ***3.3.3*** | 对话框底部操作区域 | `slotClass: string` 操作容器样式 <br> `cancel: () => void` 取消的回调函数 <br> `confirm: () => void` 确认的回调函数 |
 
 ### 样式变量
 

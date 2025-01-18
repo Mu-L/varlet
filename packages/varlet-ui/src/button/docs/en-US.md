@@ -93,19 +93,19 @@ Button component for triggering actions.
 ```html
 <template>
   <var-space :size="[10, 10]">
-    <var-button type="primary" round>
+    <var-button type="primary" round icon-container>
       <var-icon name="plus" />
     </var-button>
-    <var-button type="info" round>
+    <var-button type="info" round icon-container>
       <var-icon name="information" />
     </var-button>
-    <var-button type="success" round>
+    <var-button type="success" round icon-container>
       <var-icon name="check" />
     </var-button>
-    <var-button type="warning" round>
+    <var-button type="warning" round icon-container>
       <var-icon name="warning" />
     </var-button>
-    <var-button type="danger" round>
+    <var-button type="danger" round icon-container>
       <var-icon name="window-close" />
     </var-button>
   </var-space>
@@ -316,6 +316,7 @@ function handleAutoLoadingClick() {
 | `outline`        | Whether to be outline button                                                            | _boolean_ | `false`        |
 | `disabled`       | Whether to disable button                                                               | _boolean_ | `false`        |
 | `ripple`         | Whether to be ripple button                                                             | _boolean_ | `true`         |
+| `focusable` ***3.3.13*** | Whether to be focus button                                                        | _boolean_ | `true`         |
 | `text-color`     | Button Text color                                                                       | _string_  | `-`            |
 | `color`          | Button background color                                                                 | _string_  | `-`            |
 | `elevation` | Elevation level, options `true` `false` and level of `0-24` | _string \| number \| boolean_|   `true`    |

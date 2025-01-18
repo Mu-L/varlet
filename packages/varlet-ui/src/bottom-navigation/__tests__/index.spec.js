@@ -1,11 +1,11 @@
-import BottomNavigation from '..'
-import BottomNavigationItem from '../../bottom-navigation-item'
-import VarBottomNavigation from '../BottomNavigation'
-import VarBottomNavigationItem from '../../bottom-navigation-item/BottomNavigationItem'
 import { createApp } from 'vue'
 import { mount } from '@vue/test-utils'
+import { describe, expect, test, vi } from 'vitest'
+import BottomNavigation from '..'
+import BottomNavigationItem from '../../bottom-navigation-item'
+import VarBottomNavigationItem from '../../bottom-navigation-item/BottomNavigationItem'
 import { delay, trigger } from '../../utils/test'
-import { expect, vi, test, describe } from 'vitest'
+import VarBottomNavigation from '../BottomNavigation'
 
 const Wrapper = {
   components: {
@@ -108,7 +108,7 @@ describe('test bottom-navigation events', () => {
           setTimeout(() => {
             resolve(true)
           }, 200)
-        })
+        }),
     )
     const wrapper = mount({
       components: {
@@ -240,7 +240,7 @@ describe('test bottom-navigation component props', () => {
     expect(wrapper.find('.var-bottom-navigation-item--active').attributes('style')).toContain('color: red;')
     await wrapper.setProps({ activeColor: '#ffffff' })
     expect(wrapper.find('.var-bottom-navigation-item--active').attributes('style')).toContain(
-      'color: rgb(255, 255, 255);'
+      'color: rgb(255, 255, 255);',
     )
     wrapper.unmount()
   })
@@ -262,6 +262,23 @@ describe('test bottom-navigation component props', () => {
     wrapper.unmount()
   })
 
+  test('test bottom-navigation placeholder', async () => {
+    const wrapper = mount(VarBottomNavigation, {
+      props: {
+        placeholder: true,
+        fixed: true,
+      },
+    })
+
+    expect(wrapper.find('.var-bottom-navigation__placeholder').exists()).toBe(true)
+    await wrapper.setProps({ placeholder: false, fixed: false })
+    expect(wrapper.find('.var-bottom-navigation__placeholder').exists()).toBe(false)
+    await wrapper.setProps({ placeholder: true, fixed: false })
+    expect(wrapper.find('.var-bottom-navigation__placeholder').exists()).toBe(false)
+
+    wrapper.unmount()
+  })
+
   test('test bottom-navigation fab-props', async () => {
     const wrapper = mount(Wrapper, {
       props: {
@@ -274,6 +291,31 @@ describe('test bottom-navigation component props', () => {
     await wrapper.setProps({ fabProps: { size: 'large', type: 'success' } })
     expect(wrapper.find('.var-button').classes()).toContain('var-button--large')
     expect(wrapper.find('.var-button').classes()).toContain('var-button--success')
+    wrapper.unmount()
+  })
+
+  test('test variant mode', async () => {
+    const wrapper = mount({
+      components: {
+        [VarBottomNavigation.name]: VarBottomNavigation,
+        [VarBottomNavigationItem.name]: VarBottomNavigationItem,
+      },
+      data: () => ({
+        variant: false,
+      }),
+      template: `
+<var-bottom-navigation :variant="variant">
+  <var-bottom-navigation-item label="tag 1" icon="home" name="home" :badge="{ dot: true, value: 10 }" />
+  <var-bottom-navigation-item label="tag 2" icon="magnify" />
+  <var-bottom-navigation-item label="tag 3" icon="heart" />
+  <var-bottom-navigation-item label="tag 4" icon="account-circle" />
+</var-bottom-navigation>
+      `,
+    })
+
+    expect(wrapper.html()).toMatchSnapshot()
+    await wrapper.setData({ variant: true })
+    expect(wrapper.html()).toMatchSnapshot()
     wrapper.unmount()
   })
 })

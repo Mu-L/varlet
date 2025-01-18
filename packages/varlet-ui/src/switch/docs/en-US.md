@@ -93,7 +93,22 @@ const value = ref(true)
 </script>
 
 <template>
-  <var-switch v-model="value" :rules="[(v) => v === true || 'Error！']"/>
+  <var-switch v-model="value" :rules="v => v === true || 'Error!'"/>
+</template>
+```
+
+### Validate With Zod
+
+```html
+<script setup>
+import { ref } from 'vue'
+import { z } from 'zod'
+
+const value = ref(true)
+</script>
+
+<template>
+  <var-switch v-model="value" :rules="z.boolean().refine(v => v === true, 'Error!')" />
 </template>
 ```
 
@@ -123,6 +138,20 @@ function handleBeforeChange(value, change) {
 </template>
 ```
 
+### Variant
+
+```html
+<script setup>
+import { ref } from 'vue'
+
+const value = ref(true)
+</script>
+
+<template>
+  <var-switch variant v-model="value" />
+</template>
+```
+
 ## API
 
 ### Props
@@ -136,13 +165,15 @@ function handleBeforeChange(value, change) {
 | `readonly`       | Whether to readonly switch | _boolean_ | `false` |
 | `loading`        | Whether to show loading icon | _boolean_ | `false` |
 | `ripple`         | Whether to open ripple | _boolean_ | `true` |
+| `button-elevation` ***3.2.7*** | The elevation of handle button | _boolean_ | `true` |
 | `color`          | Background color when open | _string_ | `-` |
 | `close-color`    | Background color when close | _string_ | `-` |
 | `loading-color`  | Color of loading icon | _string_ | `-` |
 | `size`           | Size of switch | _string \| number_ | `-` |
-| `rules`          | Validation rules | _Array<(value: any) => any>_  | `-` |
+| `rules` | Validation rules, return `true` to indicate verification passes, other types of values ​​will be converted into text as user prompts. [Zod validation](#/en-US/zodValidation) is supported since `3.5.0` | _((v: any) => any) \| ZodType \| Array<((v: any) => any) \| ZodType>_ | `-` |
 | `lazy-change`    | Whether to allow the `before-change` event to be triggered | _boolean_  | `false` |
-| `validate-trigger` | Timing to trigger verification, optional values are `onChange` `onLazyChange` | _ValidateTriggers[]_ | `['onChange', 'onLazyChange']` |
+| `validate-trigger` | Timing to trigger verification, optional values are `onChange` `onLazyChange` | _SwitchValidateTrigger[]_ | `['onChange', 'onLazyChange']` |
+| `variant` ***3.2.3*** | Variant mode | _boolean_ | `false` |
 
 ### Events
 
@@ -162,8 +193,32 @@ Here are the CSS variables used by the component. Styles can be customized using
 | `--switch-track-active-background` | `var(--color-primary)` |
 | `--switch-track-error-background` | `var(--color-danger)` |
 | `--switch-ripple-color` | `var(--color-primary)` |
-| `--switch-handle-background` | `#fff` |
-| `--switch-handle-color` | `#fff` |
+| `--switch-handle-background` | `var(--color-on-primary)` |
+| `--switch-handle-color` | `var(--color-primary)` |
+| `--switch-handle-active-color` | `var(--color-on-primary)` |
 | `--switch-handle-active-background` | `var(--color-primary)` |
 | `--switch-handle-error-background` | `var(--color-danger)` |
 | `--switch-disabled-opacity` | `var(--opacity-disabled)` |
+| `--switch-variant-width` | `52px` |
+| `--switch-variant-height` | `32px` |
+| `--switch-variant-track-border-color` | `#888` |
+| `--switch-variant-track-background` | `var(--color-surface-container-highest)` |
+| `--switch-variant-handle-width` | `24px` |
+| `--switch-variant-handle-height` | `24px` |
+| `--switch-variant-handle-color` | `var(--color-on-primary)` |
+| `--switch-variant-handle-active-color` | `var(--color-primary)` |
+| `--switch-variant-handle-background` | `#888` |
+| `--switch-variant-handle-active-background` | `var(--color-on-primary)` |
+| `--switch-width` | `40px` |
+| `--switch-height` | `24px` |
+| `--switch-track-width` | `38px` |
+| `--switch-track-height` | `14.4px` |
+| `--switch-track-border-radius` | `calc(20px * 2 / 3)` |
+| `--switch-handle-width` | `20px` |
+| `--switch-handle-height` | `20px` |
+| `--switch-ripple-size` | `40px` |
+| `--switch-ripple-left` | `-10px` |
+| `--switch-ripple-active-left` | `10px` |
+| `--switch-loading-size` | `16px` |
+| `--switch-variant-ripple-left` | `-4px` |
+| `--switch-variant-ripple-active-left` | `16px` |

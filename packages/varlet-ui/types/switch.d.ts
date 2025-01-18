@@ -1,4 +1,4 @@
-import { VarComponent, BasicAttributes, ListenerProp, SetPropsDefaults } from './varComponent'
+import { BasicAttributes, ListenerProp, SetPropsDefaults, Rules as SwitchRules, VarComponent } from './varComponent'
 
 export declare const switchProps: Record<keyof SwitchProps, any>
 
@@ -12,13 +12,15 @@ export interface SwitchProps extends BasicAttributes {
   readonly?: boolean
   loading?: boolean
   ripple?: boolean
+  buttonElevation?: boolean
   color?: string
   loadingColor?: string
   closeColor?: string
   size?: string | number
   lazyChange?: boolean
   validateTrigger?: Array<SwitchValidateTrigger>
-  rules?: Array<(value: any) => any>
+  variant?: boolean
+  rules?: SwitchRules
   onClick?: ListenerProp<(event: Event) => void>
   onChange?: ListenerProp<(value: any) => void>
   'onUpdate:modelValue'?: ListenerProp<(value: any) => void>

@@ -1,11 +1,11 @@
-import zhCN from './zh-CN'
-import enUS from './en-US'
-import zhTW from './zh-TW'
-import zhHK from './zh-HK'
-import faIR from './fa-IR'
 import { ref, type Ref } from 'vue'
-import { type Month, type Week } from '../date-picker/props'
 import { hasOwn } from '@varlet/shared'
+import { type Month, type Week } from '../date-picker/props'
+import enUS from './en-US'
+import faIR from './fa-IR'
+import zhCN from './zh-CN'
+import zhHK from './zh-HK'
+import zhTW from './zh-TW'
 
 export type Message = {
   // Dialog
@@ -38,41 +38,41 @@ export type Message = {
   [key: PropertyKey]: any
 }
 
+type ValueOf<T> = T[keyof T]
+
 function useLocale<T = Message>() {
-  const messages: Record<string, Partial<T>> = {}
+  const messages = ref<Record<string, Partial<T>>>({})
   const currentMessage: Ref<Partial<T>> = ref({})
 
   const add = (lang: string, message: Partial<T> & { lang?: string }) => {
     message.lang = lang
-    messages[lang] = message
+    messages.value[lang] = message
   }
 
   const use = (lang: string) => {
-    if (!messages[lang]) {
+    if (!messages.value[lang]) {
       console.warn(`The ${lang} does not exist. You can mount a language message using the add method`)
       return {}
     }
 
-    currentMessage.value = messages[lang]
+    currentMessage.value = messages.value[lang]
   }
 
   const merge = (lang: string, message: Partial<T>) => {
-    if (!messages[lang]) {
+    if (!messages.value[lang]) {
       console.warn(`The ${lang} does not exist. You can mount a language message using the add method`)
       return
     }
 
-    messages[lang] = { ...messages[lang], ...message }
+    messages.value[lang] = { ...messages.value[lang], ...message }
 
     use(lang)
   }
 
-  const t = (id: string) => {
+  const t = (id: string): ValueOf<T> | undefined => {
     if (hasOwn(currentMessage.value, id)) {
       return currentMessage.value[id]
     }
-
-    return id
   }
 
   return {
@@ -90,9 +90,22 @@ const { messages, currentMessage, add, use, merge, t } = useLocale()
 add('zh-CN', zhCN)
 use('zh-CN')
 
-export { zhCN, enUS, messages, currentMessage, add, use, merge, t, useLocale }
+export { zhCN, enUS, zhTW, zhHK, faIR, messages, currentMessage, add, use, merge, t, useLocale }
 
-export const _LocaleComponent = { zhCN, enUS, messages, currentMessage, add, use, merge, t, useLocale }
+export const _LocaleComponent = {
+  zhCN,
+  enUS,
+  zhTW,
+  zhHK,
+  faIR,
+  messages,
+  currentMessage,
+  add,
+  use,
+  merge,
+  t,
+  useLocale,
+}
 
 export default {
   zhCN,

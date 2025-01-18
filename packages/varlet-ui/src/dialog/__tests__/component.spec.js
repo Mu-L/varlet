@@ -1,9 +1,11 @@
-import Dialog from '..'
-import VarDialog from '../Dialog'
-import { mount } from '@vue/test-utils'
 import { createApp } from 'vue'
+import { mount } from '@vue/test-utils'
+import { describe, expect, test, vi } from 'vitest'
+import Dialog from '..'
+import VarButton from '../../button'
+import VarIcon from '../../icon'
 import { delay, triggerKeyboard } from '../../utils/test'
-import { expect, vi, describe, test } from 'vitest'
+import VarDialog from '../Dialog'
 
 test('test dialog component plugin', () => {
   const app = createApp({}).use(Dialog.Component)
@@ -197,7 +199,7 @@ describe('test dialog component props', () => {
     })
 
     expect(wrapper.find('.var-dialog__confirm-button[var-dialog-cover]').attributes('style')).toContain(
-      'background: blue'
+      'background: blue',
     )
 
     wrapper.unmount()
@@ -212,7 +214,7 @@ describe('test dialog component props', () => {
     })
 
     expect(wrapper.find('.var-dialog__cancel-button[var-dialog-cover]').attributes('style')).toContain(
-      'background: blue'
+      'background: blue',
     )
 
     wrapper.unmount()
@@ -355,6 +357,91 @@ describe('test dialog component events', () => {
     await triggerKeyboard(window, 'keydown', { key: 'Escape' })
     expect(onKeyEscape).toBeCalledTimes(1)
     expect(wrapper.vm.show).toBe(true)
+
+    wrapper.unmount()
+  })
+})
+
+describe('test dialog component slots', () => {
+  test('test dialog title slot', async () => {
+    const wrapper = mount({
+      components: {
+        [VarDialog.name]: VarDialog,
+        [VarIcon.name]: VarIcon,
+      },
+      data: () => ({
+        show: true,
+      }),
+      template: `
+        <var-dialog v-model:show="show" :teleport="null">
+          <template #title>
+            <var-icon name="information" />
+          </template>
+        </var-dialog>
+      `,
+    })
+
+    expect(wrapper.html()).toMatchSnapshot()
+
+    await wrapper.find('.var-icon').exists()
+
+    wrapper.unmount()
+  })
+
+  test('test dialog default slot', () => {
+    const wrapper = mount({
+      components: {
+        [VarDialog.name]: VarDialog,
+      },
+      data: () => ({
+        show: true,
+      }),
+      template: `
+        <var-dialog v-model:show="show" :teleport="null">
+          dialog default slot
+        </var-dialog>
+      `,
+    })
+
+    expect(wrapper.find('.var-dialog__message').text()).toBe('dialog default slot')
+
+    expect(wrapper.html()).toMatchSnapshot()
+
+    wrapper.unmount()
+  })
+
+  test('test dialog actions slot', async () => {
+    const wrapper = mount({
+      components: {
+        [VarDialog.name]: VarDialog,
+        [VarButton.name]: VarButton,
+      },
+      data: () => ({
+        show: true,
+      }),
+      template: `<var-dialog v-model:show="show" :teleport="null">
+        <template #actions="{slotClass, cancel, confirm}">
+          <div :class="slotClass">
+            <var-button class="cancel" @click="cancel">cancel</var-button>
+            <var-button class="confirm" @click="confirm">confirm</var-button>
+          </div>
+        </template>
+      </var-dialog>`,
+    })
+
+    expect(wrapper.html()).toMatchSnapshot()
+
+    await wrapper.find('.cancel').trigger('click')
+    await delay(300)
+    expect(wrapper.vm.show).toBe(false)
+
+    await wrapper.setData({
+      show: true,
+    })
+
+    await wrapper.find('.confirm').trigger('click')
+    await delay(300)
+    expect(wrapper.vm.show).toBe(false)
 
     wrapper.unmount()
   })

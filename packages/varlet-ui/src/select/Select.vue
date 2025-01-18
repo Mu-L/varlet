@@ -7,6 +7,7 @@
     @blur="handleRootBlur"
   >
     <var-menu
+      v-model:show="showMenu"
       var-select-cover
       same-width
       close-on-click-reference
@@ -17,7 +18,6 @@
       :disabled="formReadonly || readonly || formDisabled || disabled"
       :placement="placement"
       :default-style="false"
-      v-model:show="showMenu"
       @click-outside="handleClickOutside"
     >
       <var-field-decorator
@@ -32,7 +32,7 @@
           focusColor,
           blurColor,
           isFocusing,
-          errorMessage,
+          isError: !!errorMessage,
           formDisabled,
           disabled,
           clearable,
@@ -53,29 +53,31 @@
           }"
         >
           <div :class="n('label')">
-            <slot name="selected" v-if="!isEmptyModelValue">
+            <slot v-if="!isEmptyModelValue" name="selected">
               <template v-if="multiple">
-                <div :class="n('chips')" v-if="chip">
+                <div v-if="chip" :class="n('chips')">
                   <var-chip
+                    v-for="l in labels"
+                    :key="l"
                     :class="n('chip')"
                     var-select-cover
                     closeable
                     size="small"
                     :type="errorMessage ? 'danger' : undefined"
-                    v-for="l in labels"
-                    :key="l"
                     @click.stop
                     @close="() => handleClose(l)"
                   >
-                    {{ l }}
+                    <maybe-v-node :is="l" />
                   </var-chip>
                 </div>
-                <div :class="n('values')" v-else>
-                  {{ labels.join(separator) }}
+                <div v-else :class="n('values')">
+                  <template v-for="(l, labelIndex) in labels" :key="l">
+                    <maybe-v-node :is="l" />{{ labelIndex !== labels.length - 1 ? separator : '' }}
+                  </template>
                 </div>
               </template>
 
-              <span v-else>{{ label }}</span>
+              <maybe-v-node :is="label" v-else />
             </slot>
           </div>
 
@@ -110,6 +112,17 @@
 
       <template #menu>
         <div ref="menuEl" :class="classes(n('scroller'), n('$-elevation--3'))">
+          <template v-if="options.length">
+            <var-option
+              v-for="option in options"
+              :key="option[valueKey]"
+              :label="option[labelKey]"
+              :value="option[valueKey]"
+              :option="option"
+              :disabled="option.disabled"
+              :ripple="option.ripple"
+            />
+          </template>
           <slot />
         </div>
       </template>
@@ -120,22 +133,22 @@
 </template>
 
 <script lang="ts">
-import VarIcon from '../icon'
-import VarMenu from '../menu'
+import { computed, defineComponent, nextTick, ref, watch } from 'vue'
+import { assert, call, doubleRaf, isArray, isEmpty, isFunction, preventDefault } from '@varlet/shared'
+import { useEventListener } from '@varlet/use'
 import VarChip from '../chip'
 import VarFieldDecorator from '../field-decorator'
 import VarFormDetails from '../form-details'
-import { computed, defineComponent, ref, watch, nextTick } from 'vue'
-import { isArray, isEmpty, call, preventDefault, doubleRaf } from '@varlet/shared'
-import { props, type SelectValidateTrigger } from './props'
-import { useValidation, createNamespace } from '../utils/components'
-import { useOptions, type SelectProvider } from './provide'
 import { useForm } from '../form/provide'
-import { focusChildElementByKey, toPxNum } from '../utils/elements'
-import { error } from '../utils/logger'
-import { useSelectController } from './useSelectController'
+import VarIcon from '../icon'
+import VarMenu from '../menu'
+import VarOption from '../option'
 import { type OptionProvider } from '../option/provide'
-import { useEventListener } from '@varlet/use'
+import { createNamespace, MaybeVNode, useValidation } from '../utils/components'
+import { focusChildElementByKey, toPxNum } from '../utils/elements'
+import { props, type SelectValidateTrigger } from './props'
+import { useOptions, type SelectProvider } from './provide'
+import { useSelectController } from './useSelectController'
 
 const { name, n, classes } = createNamespace('select')
 
@@ -145,8 +158,10 @@ export default defineComponent({
     VarIcon,
     VarMenu,
     VarChip,
+    VarOption,
     VarFieldDecorator,
     VarFormDetails,
+    MaybeVNode,
   },
   props,
   setup(props) {
@@ -207,11 +222,12 @@ export default defineComponent({
     watch(
       () => props.multiple,
       () => {
-        const { multiple, modelValue } = props
-        if (multiple && !isArray(modelValue)) {
-          error('Select', 'The modelValue must be an array when multiple is true')
-        }
-      }
+        assert(
+          props.multiple && isArray(props.modelValue),
+          'Select',
+          'The modelValue must be an array when multiple is true',
+        )
+      },
     )
 
     bindOptions(selectProvider)
@@ -377,7 +393,7 @@ export default defineComponent({
 
       const option = options.find(({ label }) => label.value === text)
       const currentModelValue = (modelValue as unknown as any[]).filter(
-        (value) => value !== (option!.value.value ?? option!.label.value)
+        (value) => value !== (option!.value.value ?? option!.label.value),
       )
 
       call(props['onUpdate:modelValue'], currentModelValue)
@@ -424,6 +440,7 @@ export default defineComponent({
       cursor,
       placeholderColor,
       enableCustomPlaceholder,
+      isFunction,
       n,
       classes,
       handleFocus,
@@ -451,5 +468,6 @@ export default defineComponent({
 @import '../field-decorator/fieldDecorator';
 @import '../form-details/formDetails';
 @import '../chip/chip';
+@import '../option/option';
 @import './select';
 </style>

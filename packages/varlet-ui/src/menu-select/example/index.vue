@@ -1,7 +1,8 @@
 <script setup>
-import { ref } from 'vue'
-import { watchLang, onThemeChange, AppType } from '@varlet/cli/client'
-import { use, t } from './locale'
+import { computed, ref } from 'vue'
+import { AppType, onThemeChange, watchLang } from '@varlet/cli/client'
+import { Snackbar } from '@varlet/ui'
+import { t, use } from './locale'
 
 const value = ref()
 const valueNormal = ref()
@@ -13,7 +14,76 @@ const valueMapping = ref()
 const valueScrollable = ref()
 const valueCloseOnSelect = ref()
 const valueMultiple = ref([])
+const valueSelectOptions = ref()
+const valueKeyedSelectOptions = ref()
 const options = ref(Array.from({ length: 30 }, (_, index) => ({ label: `Option ${index + 1}`, value: index })))
+const selectOptions = computed(() => [
+  {
+    label: t('eat'),
+    value: 1,
+  },
+  {
+    label: t('sleep'),
+    value: 2,
+  },
+  {
+    label: t('play'),
+    value: 3,
+    disabled: true,
+  },
+])
+const keyedSelectOptions = computed(() => [
+  {
+    name: t('eat'),
+    id: 1,
+  },
+  {
+    name: t('sleep'),
+    id: 2,
+  },
+  {
+    name: t('play'),
+    id: 3,
+    disabled: true,
+  },
+])
+
+const cascadeValue = ref()
+const cascadeMultipleValue = ref([])
+const cascadeOptions = ref([
+  {
+    label: '1',
+    value: 1,
+  },
+  {
+    label: '2',
+    value: 2,
+    children: [
+      {
+        label: '2-1',
+        value: 21,
+        children: [
+          {
+            label: '2-1-1',
+            value: 211,
+          },
+          {
+            label: '2-1-2',
+            value: 212,
+          },
+        ],
+      },
+      {
+        label: '2-2',
+        value: 22,
+      },
+    ],
+  },
+  {
+    label: '3',
+    value: 3,
+  },
+])
 
 watchLang((lang) => {
   use(lang)
@@ -27,14 +97,32 @@ watchLang((lang) => {
   valueScrollable.value = undefined
   valueCloseOnSelect.value = undefined
   valueMultiple.value = []
+  cascadeValue.value = undefined
+  cascadeMultipleValue.value = []
 })
+
 onThemeChange()
+
+function handleSelect(value) {
+  Snackbar(`Select: ${value}`)
+}
 </script>
 
 <template>
   <app-type>{{ t('basicUsage') }}</app-type>
   <var-menu-select v-model="value">
     <var-button type="primary">{{ value ? value : t('please') }}</var-button>
+
+    <template #options>
+      <var-menu-option :label="t('eat')" />
+      <var-menu-option :label="t('sleep')" />
+      <var-menu-option :label="t('play')" />
+    </template>
+  </var-menu-select>
+
+  <app-type>{{ t('onSelect') }}</app-type>
+  <var-menu-select @select="handleSelect">
+    <var-button type="primary">{{ t('please') }}</var-button>
 
     <template #options>
       <var-menu-option :label="t('eat')" />
@@ -55,7 +143,7 @@ onThemeChange()
       </template>
     </var-menu-select>
 
-    <var-menu-select size="small" v-model="valueSmall">
+    <var-menu-select v-model="valueSmall" size="small">
       <var-button type="primary">{{ valueSmall ? valueSmall : t('small') }}</var-button>
 
       <template #options>
@@ -65,7 +153,7 @@ onThemeChange()
       </template>
     </var-menu-select>
 
-    <var-menu-select size="mini" v-model="valueMini">
+    <var-menu-select v-model="valueMini" size="mini">
       <var-button type="primary">{{ valueMini ? valueMini : t('mini') }}</var-button>
 
       <template #options>
@@ -75,7 +163,7 @@ onThemeChange()
       </template>
     </var-menu-select>
 
-    <var-menu-select size="large" v-model="valueLarge">
+    <var-menu-select v-model="valueLarge" size="large">
       <var-button type="primary">{{ valueLarge ? valueLarge : t('large') }}</var-button>
 
       <template #options>
@@ -98,7 +186,7 @@ onThemeChange()
   </var-menu-select>
 
   <app-type>{{ t('scrollable') }}</app-type>
-  <var-menu-select scrollable v-model="valueScrollable">
+  <var-menu-select v-model="valueScrollable" scrollable>
     <var-button type="primary">{{ valueScrollable ? valueScrollable : t('please') }}</var-button>
 
     <template #options>
@@ -118,7 +206,7 @@ onThemeChange()
   </var-menu-select>
 
   <app-type>{{ t('multiple') }}</app-type>
-  <var-menu-select multiple v-model="valueMultiple">
+  <var-menu-select v-model="valueMultiple" multiple>
     <var-button type="primary">{{ valueMultiple.length ? valueMultiple : t('please') }}</var-button>
 
     <template #options>
@@ -131,7 +219,7 @@ onThemeChange()
   </var-menu-select>
 
   <app-type>{{ t('closeOnSelect') }}</app-type>
-  <var-menu-select :close-on-select="false" v-model="valueCloseOnSelect">
+  <var-menu-select v-model="valueCloseOnSelect" :close-on-select="false">
     <var-button type="primary">{{ valueCloseOnSelect ? valueCloseOnSelect : t('please') }}</var-button>
 
     <template #options>
@@ -139,5 +227,25 @@ onThemeChange()
       <var-menu-option :label="t('sleep')" />
       <var-menu-option :label="t('play')" />
     </template>
+  </var-menu-select>
+
+  <app-type>{{ t('selectOptions') }}</app-type>
+  <var-menu-select v-model="valueSelectOptions" :options="selectOptions">
+    <var-button type="primary">{{ valueSelectOptions ? valueSelectOptions : t('please') }}</var-button>
+  </var-menu-select>
+
+  <app-type>{{ t('cascade') }}</app-type>
+  <var-menu-select v-model="cascadeValue" :options="cascadeOptions">
+    <var-button type="primary">{{ cascadeValue ? cascadeValue : t('please') }}</var-button>
+  </var-menu-select>
+
+  <app-type>{{ t('multipleCascade') }}</app-type>
+  <var-menu-select v-model="cascadeMultipleValue" multiple :options="cascadeOptions">
+    <var-button type="primary">{{ cascadeMultipleValue.length ? cascadeMultipleValue : t('please') }}</var-button>
+  </var-menu-select>
+
+  <app-type>{{ t('selectOptionsWithCustomizedKey') }}</app-type>
+  <var-menu-select v-model="valueKeyedSelectOptions" :options="keyedSelectOptions" label-key="name" value-key="id">
+    <var-button type="primary">{{ valueKeyedSelectOptions ? valueKeyedSelectOptions : t('please') }}</var-button>
   </var-menu-select>
 </template>

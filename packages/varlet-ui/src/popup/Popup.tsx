@@ -1,13 +1,12 @@
-import { defineComponent, watch, Transition, Teleport, computed } from 'vue'
-import { props } from './props'
-import { useLock } from '../context/lock'
-import { useZIndex } from '../context/zIndex'
-import { useStack } from '../context/stack'
-import { useRouteListener, useTeleport, createNamespace } from '../utils/components'
-import { usePopupItems } from './provide'
-import { useEventListener, useInitialized } from '@varlet/use'
+import { computed, defineComponent, Teleport, Transition, watch } from 'vue'
 import { call, preventDefault } from '@varlet/shared'
-
+import { useEventListener, useInitialized } from '@varlet/use'
+import { useLock } from '../context/lock'
+import { useStack } from '../context/stack'
+import { useZIndex } from '../context/zIndex'
+import { createNamespace, useRouteListener, useTeleport } from '../utils/components'
+import { props } from './props'
+import { usePopupItems } from './provide'
 import '../styles/common.less'
 import './popup.less'
 
@@ -20,20 +19,21 @@ export default defineComponent({
   setup(props, { slots, attrs }) {
     const rendered = useInitialized(() => props.show, true)
     const { zIndex } = useZIndex(() => props.show, 3)
-    const { onStackTop } = useStack(() => props.show, zIndex)
+    const normalizedZIndex = computed(() => props.zIndex ?? zIndex.value)
+    const { onStackTop } = useStack(() => props.show, normalizedZIndex)
     const { disabled } = useTeleport()
     const { bindPopupItems } = usePopupItems()
 
     useLock(
       () => props.show,
-      () => props.lockScroll
+      () => props.lockScroll,
     )
 
     watch(
       () => props.show,
       (newValue: boolean) => {
         newValue ? call(props.onOpen) : call(props.onClose)
-      }
+      },
     )
 
     bindPopupItems({ show: computed(() => props.show) })
@@ -62,7 +62,7 @@ export default defineComponent({
         <div
           class={classes(n('overlay'), overlayClass)}
           style={{
-            zIndex: zIndex.value - 1,
+            zIndex: normalizedZIndex.value - 1,
             ...overlayStyle,
           }}
           onClick={hidePopup}
@@ -79,9 +79,11 @@ export default defineComponent({
             [props.defaultStyle, n('--content-background-color')],
             [props.defaultStyle, n('$-elevation--3')],
             [props.safeArea, n('--safe-area')],
-            [props.safeAreaTop, n('--safe-area-top')]
+            [props.safeAreaTop, n('--safe-area-top')],
           )}
-          style={{ zIndex: zIndex.value }}
+          style={{ zIndex: normalizedZIndex.value }}
+          role="dialog"
+          aria-modal="true"
           {...attrs}
           v-show={props.show}
         >
@@ -95,7 +97,7 @@ export default defineComponent({
         <Transition name={n('$-fade')} onAfterEnter={props.onOpened} onAfterLeave={props.onClosed}>
           <div
             class={classes(n('$--box'), n(), [!props.overlay, n('--pointer-events-none')])}
-            style={{ zIndex: zIndex.value - 2 }}
+            style={{ zIndex: normalizedZIndex.value - 2 }}
             v-show={props.show}
           >
             {props.overlay && renderOverlay()}

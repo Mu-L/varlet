@@ -1,8 +1,8 @@
+import { createApp } from 'vue'
+import { mount } from '@vue/test-utils'
+import { describe, expect, test } from 'vitest'
 import AppBar from '..'
 import VarAppBar from '../AppBar'
-import { mount } from '@vue/test-utils'
-import { createApp } from 'vue'
-import { expect, test, describe } from 'vitest'
 
 test('test app bar use', () => {
   const app = createApp({}).use(AppBar)
@@ -29,6 +29,17 @@ describe('test app bar component props', () => {
     })
 
     expect(wrapper.find('.var-app-bar').classes('var-app-bar--round')).toBeTruthy()
+    wrapper.unmount()
+  })
+
+  test('test app bar border', () => {
+    const wrapper = mount(VarAppBar, {
+      props: {
+        border: true,
+      },
+    })
+
+    expect(wrapper.find('.var-app-bar').classes('var-app-bar--border')).toBeTruthy()
     wrapper.unmount()
   })
 
@@ -84,12 +95,12 @@ describe('test app bar component props', () => {
       },
     })
 
-    expect(wrapper.classes().includes('var-elevation--3')).toBe(true)
+    expect(wrapper.find('.var-elevation--3').exists()).toBe(true)
 
     await wrapper.setProps({
       elevation: false,
     })
-    expect(wrapper.classes().includes('var-elevation--3')).toBe(false)
+    expect(wrapper.find('.var-elevation--3').exists()).toBe(false)
 
     wrapper.unmount()
   })
@@ -115,6 +126,23 @@ describe('test app bar component props', () => {
     })
 
     expect(wrapper.find('.var-app-bar--fixed').exists()).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  test('test app-bar placeholder', async () => {
+    const wrapper = mount(VarAppBar, {
+      props: {
+        placeholder: true,
+        fixed: true,
+      },
+    })
+
+    expect(wrapper.find('.var-app-bar__placeholder').exists()).toBe(true)
+    await wrapper.setProps({ placeholder: false, fixed: false })
+    expect(wrapper.find('.var-app-bar__placeholder').exists()).toBe(false)
+    await wrapper.setProps({ placeholder: true, fixed: false })
+    expect(wrapper.find('.var-app-bar__placeholder').exists()).toBe(false)
 
     wrapper.unmount()
   })

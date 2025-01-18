@@ -1,11 +1,11 @@
-import execa from 'execa'
-import { createSpinner } from 'nanospinner'
 import { resolve } from 'path'
+import { createSpinner } from 'nanospinner'
+import { x } from 'tinyexec'
 
 const CWD = process.cwd()
 
 export function createTask(cwd, command = 'build') {
-  return () => execa('pnpm', [command], { cwd })
+  return () => x('pnpm', [command], { nodeOptions: { cwd } })
 }
 
 export async function runTask(taskName, task) {
@@ -28,6 +28,8 @@ export const buildShared = createTask(resolve(CWD, './packages/varlet-shared'))
 
 export const buildPresetUnocss = createTask(resolve(CWD, './packages/varlet-preset-unocss'))
 
+export const buildPresetTailwindcss = createTask(resolve(CWD, './packages/varlet-preset-tailwindcss'))
+
 export const buildImportResolver = createTask(resolve(CWD, './packages/varlet-import-resolver'))
 
 export const buildUse = createTask(resolve(CWD, './packages/varlet-use'))
@@ -42,8 +44,8 @@ export async function runTaskQueue() {
   const start = performance.now()
 
   await runTask('shared & touch-emulator', () => Promise.all([buildShared(), buildToucheEmulator()]))
-  await runTask('preset-unocss & import-resolver & use & vite-plugins', () =>
-    Promise.all([buildPresetUnocss(), buildImportResolver(), buildUse(), buildVitePlugins()])
+  await runTask('preset-unocss & preset-tailwindcss & import-resolver & use & vite-plugins', () =>
+    Promise.all([buildPresetUnocss(), buildPresetTailwindcss(), buildImportResolver(), buildUse(), buildVitePlugins()]),
   )
   await runTask('cli', buildCli)
   await runTask('icons', buildIcons)

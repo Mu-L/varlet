@@ -9,6 +9,7 @@
   --time-picker-title-background: var(--color-primary);
   --time-picker-title-hint-color: '#fff';
   --time-picker-title-hint-font-size: 14px;
+  --time-picker-title-hint-min-height: 21px;
   --time-picker-title-inactive-opacity: 0.6;
   --time-picker-title-time-font-size: 50px;
   --time-picker-title-time-margin: 0 5px;
@@ -57,7 +58,7 @@
 }
 
 // Mixins
-.after-before-basic {
+.var-time-picker-after-before-basic {
   content: '';
   position: absolute;
   border-radius: 100%;
@@ -75,7 +76,7 @@
   position: relative;
   min-width: var(--time-picker-min-width);
   overflow: hidden;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: transparent;
 
   &__title {
     min-height: var(--time-picker-title-height);
@@ -94,6 +95,7 @@
       color: var(--time-picker-title-hint-color);
       font-size: var(--time-picker-title-hint-font-size);
       margin-bottom: var(--time-picker-title-margin-bottom);
+      min-height: var(--time-picker-title-hint-min-height);
     }
 
     &-time-container {
@@ -104,7 +106,7 @@
 
     &-btn {
       cursor: pointer;
-      -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+      -webkit-tap-highlight-color: transparent;
       transition: 0.3s var(--cubic-bezier);
       white-space: nowrap;
       background: var(--time-picker-title-time-background);
@@ -189,7 +191,7 @@
       border-color: var(--time-picker-clock-hand-border-color);
 
       &::before {
-        .after-before-basic();
+        .var-time-picker-after-before-basic();
 
         background: transparent;
         border: var(--time-picker-clock-hand-before-border-width) solid;
@@ -200,7 +202,7 @@
       }
 
       &::after {
-        .after-before-basic();
+        .var-time-picker-after-before-basic();
 
         border-color: inherit;
         height: var(--time-picker-clock-hand-after-height);

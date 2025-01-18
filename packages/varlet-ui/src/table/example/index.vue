@@ -1,7 +1,7 @@
 <script setup>
-import { AppType, watchLang, onThemeChange } from '@varlet/cli/client'
 import { ref } from 'vue'
-import { use, t } from './locale'
+import { AppType, onThemeChange, watchLang } from '@varlet/cli/client'
+import { t, use } from './locale'
 
 const list = ref(gen(1, 10))
 
@@ -35,6 +35,7 @@ onThemeChange()
         <th>{{ t('english') }}</th>
       </tr>
     </thead>
+
     <tbody>
       <tr>
         <td>{{ t('jerry') }}</td>

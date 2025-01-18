@@ -45,8 +45,10 @@ varlet-cli gen
 | `namespace` | 组件库命名空间, 会作为组件前缀 | _string_ | `var` |
 | `host` | 开发服务器主机 | _number_ | `localhost` |
 | `port` | 开发服务器端口 | _number_ | `8080` |
+| `proxy` | 开发服务器代理 | _Record<string, string \| ProxyOptions>_ | `-` |
 | `title` | 文档中组件库的标题 | _string_ | `VARLET` |
-| `logo` | 文档中组件库的logo | _string_ | `-` |
+| `logo` | 文档中组件库的 logo | _string_ | `-` |
+| `alias` | 路径别名 (使用相对路径时，根路径为 src 文件夹) | _Record<string, string>_ | `-` |
 | `defaultLanguage` | 文档默认语言 | _string_ | `zh-CN` |
 | `defaultLightTheme` | 默认的亮色主题 | _string_ | `md3LightTheme` |
 | `defaultDarkTheme` | 默认的暗色主题 | _string_ | `md3DarkTheme` |
@@ -58,12 +60,15 @@ varlet-cli gen
 | `md3DarkTheme` | md3 暗黑模式文档主题 | _Record<string, any>_ | `-` |
 | `highlight` | 文档代码片段样式相关 | _{ style: string }_ | `-` |
 | `analysis` | 文档统计相关 | _{ baidu: string }_ | `-` |
-| `pc` | pc 端文档结构配置 | _Record<string, any>_ | `-` |
-| `mobile` | mobile 端文档结构配置 | _Record<string, any>_ | `-` |
+| `pc` | pc 端文档结构配置 | _[VarletConfigPc](https://github.com/varletjs/varlet/blob/dev/packages/varlet-cli/src/node/config/varlet.config.ts)_ | `-` |
+| `mobile` | mobile 端文档结构配置 | _[VarletConfigMobile](https://github.com/varletjs/varlet/blob/dev/packages/varlet-cli/src/node/config/varlet.config.ts)_ | `-` |
+| `bundle` | 组件库编译的捆绑产物配置 | _{ external: string[], globals: Record<string, string> }_ | `-` |
+| `vitePlugins` | vite 插件 | _[Plugin](https://vite.dev/guide/using-plugins.html)[]_ \| `(plugins: Plugin[]) => Plugin[])` | `-` |
 | `directives` | 组件库指令文件夹名称 | _string[]_ | `[]` |
 | `copy` | 复制文件配置 | _[CopyPath[]](https://github.com/varletjs/varlet/blob/dev/packages/varlet-vite-plugins/src/copy.ts)_ | `-` |
 | `icons` | 字体图标打包相关配置 | _[VarletConfigIcons](https://github.com/varletjs/varlet/blob/dev/packages/varlet-cli/src/node/config/varlet.config.ts)_ | `-` |
 | `esbuild` | esbuild 配置 | _[VarletConfigEsbuild](https://github.com/varletjs/varlet/blob/dev/packages/varlet-cli/src/node/config/varlet.config.ts)_ | `-` |
+| `seo` | seo 选项 | _[VarletConfigSeo](https://github.com/varletjs/varlet/blob/dev/packages/varlet-cli/src/node/config/varlet.config.ts)_ | ` -` |
 
 #### Menu
 
@@ -178,6 +183,13 @@ varlet-cli build:icons
 varlet-cli test
 ```
 
+#### 执行单个组件的单元测试
+
+```shell
+# playground-ignore
+varlet-cli test -c <componentName>
+```
+
 #### 以 watch 模式执行单元测试
 
 ```shell
@@ -190,13 +202,6 @@ varlet-cli test -w
 ```shell
 # playground-ignore
 varlet-cli test -cov
-```
-
-#### 检查代码
-
-```shell
-# playground-ignore
-varlet-cli lint
 ```
 
 #### 校验提交信息
@@ -271,8 +276,8 @@ varlet-cli create
 
 ### 发布前注意
 
-- 1.`npm` 的仓库源必须指向 `npm` 官方镜像
-- 2.执行 `npm login` 进行登录
+1. `npm` 的仓库源必须指向 `npm` 官方镜像
+2. 执行 `npm login` 进行登录
 
 ### 问答
 

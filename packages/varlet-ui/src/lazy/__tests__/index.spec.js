@@ -1,8 +1,8 @@
-import Lazy, { imageCache } from '..'
-import { mount } from '@vue/test-utils'
 import { createApp } from 'vue'
+import { mount } from '@vue/test-utils'
+import { describe, expect, test } from 'vitest'
+import Lazy, { imageCache } from '..'
 import { delay, mockDoubleRaf, trigger } from '../../utils/test'
-import { expect, test, describe } from 'vitest'
 
 test('test lazy use', () => {
   const app = createApp({}).use(Lazy)
@@ -12,11 +12,11 @@ test('test lazy use', () => {
 const Wrapper = {
   directives: { Lazy },
   data: () => ({
-    src: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+    src: 'https://varletjs.org/varlet/cat.jpg',
   }),
   template: `
     <img
-      lazy-error="https://varlet.gitee.io/varlet-ui/error.jpg"
+      lazy-error="https://varletjs.org/varlet/error.jpg"
       v-lazy="src"
       lazy-loading="https://xxx.cn/loading.png"
       lazy-attempt="3"
@@ -35,7 +35,7 @@ describe('test lazy component props', () => {
 
     await trigger(wrapper.element._lazy.preloadImage, 'load')
     await delay(80)
-    expect(wrapper.find('img').attributes('src')).toBe('https://varlet.gitee.io/varlet-ui/cat.jpg')
+    expect(wrapper.find('img').attributes('src')).toBe('https://varletjs.org/varlet/cat.jpg')
 
     wrapper.unmount()
     imageCache.clear()
@@ -45,7 +45,7 @@ describe('test lazy component props', () => {
   test('test lazy error', () => {
     const { mockRestore } = mockDoubleRaf()
     const wrapper = mount(Wrapper)
-    expect(wrapper.find('img').attributes('lazy-error')).toBe('https://varlet.gitee.io/varlet-ui/error.jpg')
+    expect(wrapper.find('img').attributes('lazy-error')).toBe('https://varletjs.org/varlet/error.jpg')
     wrapper.unmount()
     imageCache.clear()
     mockRestore()
@@ -82,12 +82,12 @@ describe('test lazy component props', () => {
 
     await delay(80)
     await trigger(wrapper.element._lazy.preloadImage, 'load')
-    expect(wrapper.find('img').attributes('src')).toBe('https://varlet.gitee.io/varlet-ui/cat.jpg')
+    expect(wrapper.find('img').attributes('src')).toBe('https://varletjs.org/varlet/cat.jpg')
 
-    await wrapper.setData({ src: 'https://varlet.gitee.io/varlet-ui/dog.jpg' })
+    await wrapper.setData({ src: 'https://varletjs.org/varlet/dog.jpg' })
     await delay(80)
     await trigger(wrapper.element._lazy.preloadImage, 'load')
-    expect(wrapper.find('img').attributes('src')).toBe('https://varlet.gitee.io/varlet-ui/dog.jpg')
+    expect(wrapper.find('img').attributes('src')).toBe('https://varletjs.org/varlet/dog.jpg')
 
     wrapper.unmount()
     imageCache.clear()

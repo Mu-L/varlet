@@ -1,11 +1,11 @@
-import Image from '..'
-import VarImage from '../Image'
-import { mount } from '@vue/test-utils'
 import { createApp } from 'vue'
+import { mount } from '@vue/test-utils'
+import { describe, expect, test, vi } from 'vitest'
+import Image from '..'
 import { delay, trigger } from '../../utils/test'
-import { expect, vi, test, describe } from 'vitest'
+import VarImage from '../Image'
 
-const SRC = 'https://varlet.gitee.io/varlet-ui/cat.png'
+const SRC = 'https://varletjs.org/varlet/cat.png'
 
 test('test image plugin', () => {
   const app = createApp({}).use(Image)
@@ -143,6 +143,19 @@ describe('test image component props', () => {
     })
 
     expect(wrapper.find('.var-image__image').attributes('referrerpolicy')).toContain('no-referrer')
+    wrapper.unmount()
+  })
+
+  test('test image position', async () => {
+    const wrapper = mount(VarImage)
+
+    expect(wrapper.find('.var-image__image').attributes('style')).toContain('object-position: 50% 50%')
+
+    await wrapper.setProps({
+      position: 'left',
+    })
+    expect(wrapper.find('.var-image__image').attributes('style')).toContain('object-position: left')
+
     wrapper.unmount()
   })
 

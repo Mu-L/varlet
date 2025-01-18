@@ -1,48 +1,33 @@
 import { defineConfig } from './varlet.config.js'
 
-const title = {
-  'zh-CN': '面向 Vue3 的 Material 风格移动端组件库',
-  'en-US': 'Material design mobile components built for Vue3',
-}
-
-const description = {
-  'zh-CN':
-    'Varlet 是一个基于 Vue3 开发的 Material 风格移动端组件库，全面拥抱 Vue3 生态，由社区团队维护。支持 Typescript、按需引入、暗黑模式、主题定制、国际化，并提供 VSCode 插件保障良好的开发体验。',
-  'en-US':
-    'Varlet is a Material design mobile component library developed based on Vue3, developed and maintained by partners in the community. Support Typescript, import on demand, dark mode, theme customization, internationalization, and provide VSCode plugin to ensure a good development experience.',
-}
-
-const keywords = {
-  'zh-CN': 'Varlet,Vue3 移动端组件库,Material Design',
-  'en-US': 'Varlet,Vue3 Mobile Components Library,Material Design',
-}
-
 export default defineConfig({
   name: 'Varlet',
   namespace: 'var',
   host: 'localhost',
   port: 8080,
   title: 'VARLET',
-  logo: 'https://varlet.gitee.io/varlet-ui/varlet_icon.png',
+  logo: 'varlet_icon.png',
   defaultLanguage: 'zh-CN',
-  highlight: {
-    /**
-     * @see https://highlightjs.org/
-     */
-    style: '//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.3.2/styles/nord.min.css',
-  },
-  analysis: {
-    baidu: '',
-  },
+  themeKey: 'VARLET_V3_THEME',
+  defaultLightTheme: 'md3LightTheme',
+  defaultDarkTheme: 'md3DarkTheme',
   useMobile: false,
+  _cf: ['pages.dev', 'varletjs.org'],
+  analysis: { baidu: '' },
   pc: {
-    title,
-    description,
-    keywords,
+    title: {
+      'zh-CN': 'Varlet UI - Vue3 Material Design 组件库',
+      'en-US': 'Varlet UI - Vue3 Material Design Component Library',
+    },
     menu: [],
     redirect: '/index',
     indexPage: {
-      description,
+      description: {
+        'zh-CN':
+          'Varlet UI 是一个基于 Vue3 开发的 Material Design 组件库，全面拥抱 Vue3 生态，支持移动端和桌面端，由 varletjs 组织维护。支持 Typescript、按需引入、暗黑模式、主题定制、国际化，并提供 VSCode 插件保障良好的开发体验。',
+        'en-US':
+          'Varlet UI is a Material design component library developed based on Vue3, supporting mobile and desktop, developed and maintained by varletjs organization. Support Typescript, import on demand, dark mode, theme customization, internationalization, and provide VSCode plugin to ensure a good development experience.',
+      },
       started: {
         'zh-CN': '快速开始',
         'en-US': 'Get Started',
@@ -429,15 +414,28 @@ export default defineConfig({
       currentVersion: 'v3.x',
       versions: [
         {
-          name: 'varlet.gitee.io',
+          name: 'varletjs.org',
           items: [
             {
               label: 'v3.x',
-              link: 'https://varlet.gitee.io/varlet-ui',
+              link: 'https://varletjs.org',
             },
             {
               label: 'v2.x',
-              link: 'https://varlet.gitee.io/varlet-ui/v2',
+              link: 'https://varletjs.org/v2',
+            },
+          ],
+        },
+        {
+          name: 'varlet.pages.dev',
+          items: [
+            {
+              label: 'v3.x',
+              link: 'https://varlet.pages.dev',
+            },
+            {
+              label: 'v2.x',
+              link: 'https://varlet.pages.dev/v2',
             },
           ],
         },
@@ -446,7 +444,7 @@ export default defineConfig({
           items: [
             {
               label: 'v3.x',
-              link: 'varlet-varletjs.vercel.app',
+              link: 'https://varlet-varletjs.vercel.app',
             },
             {
               label: 'v2.x',
@@ -457,7 +455,7 @@ export default defineConfig({
       ],
       github: 'https://github.com/varletjs/varlet',
       changelog: 'https://github.com/varletjs/varlet/blob/main/CHANGELOG.md',
-      playground: 'https://varlet.gitee.io/varlet-ui-playground',
+      playground: 'https://varletjs.org/playground',
       themes: [
         { 'zh-CN': 'Md2 亮色', 'en-US': 'Md2 Light', value: 'lightTheme' },
         { 'zh-CN': 'Md2 暗色', 'en-US': 'Md2 Dark', value: 'darkTheme' },
@@ -473,11 +471,16 @@ export default defineConfig({
       defaultFold: false,
       foldHeight: 50,
     },
+    htmlInject: {
+      head: [],
+      body: [],
+    },
   },
   mobile: {
-    title,
-    description,
-    keywords,
+    title: {
+      'zh-CN': 'Varlet UI - Vue3 Material Design 组件库',
+      'en-US': 'Varlet UI - Vue3 Material Design Component Library',
+    },
     redirect: '/home',
     header: {
       i18n: {
@@ -492,10 +495,58 @@ export default defineConfig({
         { 'zh-CN': 'Md3 暗色', 'en-US': 'Md3 Dark', value: 'md3DarkTheme' },
       ],
     },
+    htmlInject: {
+      head: [],
+      body: [],
+    },
   },
-  themeKey: 'VARLET_V3_THEME',
-  defaultLightTheme: 'md3LightTheme',
-  defaultDarkTheme: 'md3DarkTheme',
+  seo: {
+    title: 'Varlet UI - Vue3 Material Design Component Library',
+    description:
+      'Varlet UI is a Material design component library developed based on Vue3, supporting mobile and desktop, developed and maintained by varletjs organization. Support Typescript, import on demand, dark mode, theme customization, internationalization, and provide VSCode plugin to ensure a good development experience.',
+    keywords: [
+      'Varlet',
+      'Varlet UI',
+      'varlet',
+      'varlet-ui',
+      'UI',
+      'Vue3 Mobile Components Library',
+      'Material Design 2',
+      'Material Design 3',
+      'Mobile',
+      'Desktop',
+      'Provide 60+ high quality general purpose components',
+      'Components are very lightweight',
+      'Developed by Chinese, complete Chinese and English documentation and logistics support',
+      'Support on-demand introduction',
+      'Support theme customization',
+      'Support internationalization',
+      'Support WebStorm syntax highlighting',
+      'Support the SSR',
+      'Support Nuxt Module',
+      'Support the Typescript',
+      'Make sure more than 90 percent unit test coverage, providing stability assurance',
+      'Supports both Material Design 2 and Material Design 3 design systems',
+      'Support dark mode',
+      'Provide official VSCode extension',
+      'Support Accessibility (still improving)',
+      'Vue3 组件库',
+      '移动端',
+      '桌面端',
+      '提供 60+ 个高质量通用组件',
+      '组件十分轻量',
+      '由国人开发，完善的中英文文档和后勤保障',
+      '支持按需引入',
+      '支持主题定制',
+      '支持国际化',
+      '支持 webstorm 组件属性高亮',
+      '支持 SSR',
+      '支持 Nuxt Module',
+      '支持 Typescript',
+      '提供官方的 VSCode 插件',
+      '支持无障碍访问（持续改进中）',
+    ].join(','),
+  },
   lightTheme: {
     'color-body': '#fff',
     'color-index-page-background': '#fff',

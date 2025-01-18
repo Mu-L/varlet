@@ -1,7 +1,7 @@
 <script setup>
-import { Snackbar } from '@varlet/ui'
-import { AppType, watchLang, onThemeChange } from '@varlet/cli/client'
 import { ref } from 'vue'
+import { AppType, onThemeChange, watchLang } from '@varlet/cli/client'
+import { Snackbar } from '@varlet/ui'
 import { t, use } from './locale/index'
 
 const trigger = ref('click')
@@ -41,7 +41,7 @@ onThemeChange()
   </var-tooltip>
 
   <app-type>{{ t('placement') }}</app-type>
-  <var-select :hint="false" v-model="placementValue">
+  <var-select v-model="placementValue" :hint="false">
     <var-option v-for="(item, index) in placementOptions" :key="index" :label="item" />
   </var-select>
   <div class="placement-container">
@@ -75,7 +75,7 @@ onThemeChange()
   </var-space>
 
   <app-type>{{ t('customColor') }}</app-type>
-  <var-tooltip content="Tooltip" color="#d81b60">
+  <var-tooltip content="Tooltip" color="#d81b60" text-color="#fff">
     <var-button type="primary">{{ t('customColor') }}</var-button>
   </var-tooltip>
 
@@ -85,7 +85,7 @@ onThemeChange()
   </var-tooltip>
 
   <app-type>{{ t('trigger') }}</app-type>
-  <var-select :hint="false" v-model="trigger">
+  <var-select v-model="trigger" :hint="false">
     <var-option label="click" />
     <var-option label="hover" />
   </var-select>
@@ -96,17 +96,17 @@ onThemeChange()
   <app-type>{{ t('events') }}</app-type>
   <var-tooltip
     content="Tooltip"
-    @open="() => Snackbar.info('open')"
-    @opened="() => Snackbar.success('opened')"
-    @close="() => Snackbar.warning('close')"
-    @closed="() => Snackbar.error('closed')"
+    @open="Snackbar.info('open')"
+    @opened="Snackbar.success('opened')"
+    @close="Snackbar.warning('close')"
+    @closed="Snackbar.error('closed')"
   >
     <var-button type="primary">{{ t('events') }}</var-button>
   </var-tooltip>
 
   <app-type>{{ t('disabled') }}</app-type>
   <var-tooltip content="Tooltip" disabled>
-    <var-button type="primary" disabled>{{ t('disabled') }}</var-button>
+    <var-button type="primary">{{ t('disabled') }}</var-button>
   </var-tooltip>
 
   <div style="margin-bottom: 100px"></div>

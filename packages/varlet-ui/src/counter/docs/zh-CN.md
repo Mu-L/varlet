@@ -147,7 +147,25 @@ const value = ref(0)
 
 <template>
   <var-counter
-    :rules="[v => v > 5 || '请选择大于5的值']"
+    :rules="v => v > 5 || '请选择大于5的值'"
+    v-model="value"
+  />
+</template>
+```
+
+### 使用 Zod 校验
+
+```html
+<script setup>
+import { ref } from 'vue'
+import { z } from 'zod'
+
+const value = ref(0)
+</script>
+
+<template>
+  <var-counter
+    :rules="z.number().min(6, '请选择大于5的值')"
     v-model="value"
   />
 </template>
@@ -159,7 +177,7 @@ const value = ref(0)
 
 | 参数 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
-| `v-model` | 绑定的值 | _string \| number_ | `0` |
+| `v-model` | 绑定的值 | _number_ | `0` |
 | `min` | 最小值 | _string \| number_ | `-` |
 | `max` | 最大值 | _string \| number_ | `-` |
 | `step` | 步长 | _string \| number_ | `1` |
@@ -179,8 +197,8 @@ const value = ref(0)
 | `press` | 是否开启按钮长按 | _boolean_ | `true` |
 | `ripple` | 是否开启水波纹 | _boolean_ | `true` |
 | `lazy-change` | 是否阻止组件本身的绑定值更新操作 | _boolean_ | `false` |
-| `validate-trigger` | 触发验证的时机，可选值为 `onInputChange` `onLazyChange` `onIncrement` `onDecrement` | _ValidateTriggers[]_ | `['onIncrement', 'onDecrement', 'onInputChange', 'onLazyChange']` |
-| `rules` | 验证规则，返回 `true` 表示验证通过，其余的值则转换为文本作为用户提示 | _Array<(value: number) => any>_ | `-` |
+| `validate-trigger` | 触发验证的时机，可选值为 `onInputChange` `onLazyChange` `onIncrement` `onDecrement` | _CounterValidateTrigger[]_ | `['onIncrement', 'onDecrement', 'onInputChange', 'onLazyChange']` |
+| `rules` | 验证规则，返回 `true` 表示验证通过，其它类型的值将转换为文本作为用户提示。自 `3.5.0` 开始支持 [Zod 验证](#/zh-CN/zodValidation)  | _((v: number) => any) \| ZodType \| Array<((v: number) => any) \| ZodType>_ | `-` |
 
 ### 方法
 

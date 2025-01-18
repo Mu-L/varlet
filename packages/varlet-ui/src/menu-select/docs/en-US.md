@@ -26,6 +26,30 @@ const value = ref()
 </template>
 ```
 
+### Selected Event
+
+```html
+<script setup>
+import { Snackbar } from '@varlet/ui'
+
+function handleSelect(value) {
+  Snackbar(`Select: ${value}`)
+}
+</script>
+
+<template>
+  <var-menu-select @select="handleSelect">
+    <var-button type="primary">Please Select</var-button>
+
+    <template #options>
+      <var-menu-option label="Eat" />
+      <var-menu-option label="Sleep" />
+      <var-menu-option label="Play game" />
+    </template>
+  </var-menu-select>
+</template>
+```
+
 ### Size
 
 ```html
@@ -213,6 +237,176 @@ const value = ref()
 </template>
 ```
 
+### Options API
+
+You can pass the options as an array to the `options` property.
+
+```html
+<script setup>
+import { ref } from 'vue'
+
+const value = ref()
+const options = ref([
+  {
+    label: 'Eat',
+    value: 1,
+  },
+  {
+    label: 'Sleep',
+    value: 2,
+  },
+  {
+    label: 'Play game',
+    value: 3,
+    disabled: true,
+  },
+])
+</script>
+
+<template>
+  <var-menu-select v-model="value" :options="options">
+    <var-button type="primary">{{ value ? value : 'Please Select' }}</var-button>
+  </var-menu-select>
+</template>
+```
+
+### Cascade
+
+An array of options may be passed to the `children` attribute of options to achieve a cascading effect.
+
+```html
+<script setup>
+import { ref } from 'vue'
+
+const value = ref()
+const options = ref([
+  {
+    label: '1',
+    value: 1,
+  },
+  {
+    label: '2',
+    value: 2,
+    children: [
+      {
+        label: '2-1',
+        value: 21,
+        children: [
+          {
+            label: '2-1-1',
+            value: 211,
+          },
+          {
+            label: '2-1-2',
+            value: 212,
+          },
+        ],
+      },
+      {
+        label: '2-2',
+        value: 22,
+      },
+    ],
+  },
+  {
+    label: '3',
+    value: 3,
+  },
+])
+</script>
+
+<template>
+  <var-menu-select v-model="value" :options="options">
+    <var-button type="primary">{{ value ? value : 'Please Select' }}</var-button>
+  </var-menu-select>
+</template>
+```
+
+### Multiple Cascade
+
+Cascading multiple selections can be achieved by setting the `multiple` attribute on the basis of cascading single selections.
+
+```html
+<script setup>
+import { ref } from 'vue'
+
+const value = ref()
+const options = ref([
+  {
+    label: '1',
+    value: 1,
+  },
+  {
+    label: '2',
+    value: 2,
+    children: [
+      {
+        label: '2-1',
+        value: 21,
+        children: [
+          {
+            label: '2-1-1',
+            value: 211,
+          },
+          {
+            label: '2-1-2',
+            value: 212,
+          },
+        ],
+      },
+      {
+        label: '2-2',
+        value: 22,
+      },
+    ],
+  },
+  {
+    label: '3',
+    value: 3,
+  },
+])
+</script>
+
+<template>
+  <var-menu-select multiple v-model="value" :options="options">
+    <var-button type="primary">{{ value ? value : 'Please Select' }}</var-button>
+  </var-menu-select>
+</template>
+```
+
+### Options API With Customized Key
+
+You can pass the options as an array of objects to the `options` property. Use the `label-key` and `value-key` properties to specify the fields for the label and value within the options array.
+
+```html
+<script setup>
+import { ref } from 'vue'
+
+const value = ref()
+const options = ref([
+   {
+    name: 'Eat',
+    id: 1,
+  },
+  {
+    name: 'Sleep',
+    id: 2,
+  },
+  {
+    name: 'Play game',
+    id: 3,
+    disabled: true,
+  },
+])
+</script>
+
+<template>
+  <var-menu-select v-model="value" :options="options" label-key="name" value-key="id">
+    <var-button type="primary">{{ value ? value : 'Please Select' }}</var-button>
+  </var-menu-select>
+</template>
+```
+
 ## API
 
 ### Props
@@ -233,12 +427,26 @@ const value = ref()
 | `offset-y`      | The y-axis offset, relative to the menu-aligned position                                                                     | _number \| string_           | `0` |
 | `teleport`      | The location of the menu mount                                                                                               | _TeleportProps['to'] \| false_ | `body`            |
 | `disabled`      | Whether to disable the menu                                                                                                  | _boolean_            | `false`           |
-| `trigger`       | Menu trigger method, optional value is `click` `hover`, `click` is triggered when clicked, `hover` is triggered when hovered | _string_  | `click`           |
-| `reference`       | The associated trigger element selector is used to specify specific child elements as trigger elements | _string_              | `-`           |
+| `trigger`       | Menu trigger method, optional value is `click` `hover` `manual` | _string_  | `click`           |
+| `reference` | The trigger element associated with the menu, the `string` type is the descendant element selector of the menu component, the `HTMLElement` type is any specified element node | _string \| HTMLElement_ | `-` |
 | `elevation` | Elevation level, options `true` `false` and level of `0-24` | _string \| number \| boolean_|   `true`    |
 | `same-width`    | Whether to same width as trigger element                                                                                     | _boolean_ | `false`           |
 | `popover-class` | Class of the popover                                                    | _string_             | `-`            |
 | `close-on-click-reference` | Whether to close the menu when clicking the reference element | _boolean_ | `false` |
+| `options` ***3.3.7*** | Specifies options | _MenuSelectOption[]_ | `[]` |
+| `label-key` ***3.3.7*** | As the key that uniquely identifies label | _string_ | `label` |
+| `value-key` ***3.3.7*** | As the key that uniquely identifies value | _string_ | `value` |
+| `children-key` ***3.8.0*** |  As the key that uniquely identifies children | _string_ | `children` |
+
+#### MenuSelectOption
+
+| Prop | Description | Type | Default |
+| ------- | --- |----------------|-----------|
+| `label`    |   The text of option    | _string \| VNode \| (option: MenuSelectOption, selected: boolean) => VNodeChild_      | `-`   |
+| `value`  |    The value of option    | _any_      | `-`   |
+| `children` ***3.8.0***  |    The children options of option | _MenuSelectOption[]_      | `-`   |
+| `disabled`    |    Whether to disable option   | _boolean_      | `-`   |
+| `ripple`  | Whether to enable ripple | _boolean_ | `true` |
 
 #### MenuOption Props
 
@@ -247,6 +455,7 @@ const value = ref()
 | `label` | The text that the option displays | _any_ | `-` |
 | `value` | The value of the option binding | _any_ | `-` |
 | `disabled` | Whether to disable | _boolean_ | `false` |
+| `ripple` ***3.3.0***  | Whether to enable ripple | _boolean_ | `true` |
 
 ### Placement
 
@@ -282,6 +491,7 @@ const value = ref()
 | `open` | Open Menu                       | `-` | `-` |
 | `close` | Close Menu                      | `-` | `-` |
 | `resize` | This method can be called to redraw when the default slot element of Menu select changes its position and size | `-` | `-` |
+| `setReference` ***3.7.2*** | Set the trigger element associated with the menu | `reference: consistent with the reference of the component attribute` | `-` |
 
 ### Events
 
@@ -294,6 +504,7 @@ const value = ref()
 | `close` | Triggered when the menu is closed | `-` |
 | `closed` | Triggered when the closing menu animation ends | `-` |
 | `click-outside` | Triggered when clicking outside the menu | `event: Event` |
+| `select` ***3.8.0*** | Triggered when selecting a option | `value: any, option: MenuSelectOption` |
 
 ### Slots
 
@@ -314,7 +525,7 @@ const value = ref()
 
 Here are the CSS variables used by the component. Styles can be customized using [StyleProvider](#/en-US/style-provider).
 
-#### Select Variables
+#### MenuSelect Variables
 
 | Variable | Default |
 | --- | --- |
@@ -323,7 +534,7 @@ Here are the CSS variables used by the component. Styles can be customized using
 | `--menu-select-menu-border-radius` | `2px` |
 | `--menu-select-menu-background-color` | `var(--color-surface-container-high)` |
 
-#### Option Variables
+#### MenuOption Variables
 
 | Variable | Default |
 | --- | --- |
@@ -339,4 +550,3 @@ Here are the CSS variables used by the component. Styles can be customized using
 | `--menu-option-selected-background` | `var(--color-primary)` |
 | `--menu-option-text-color` | `#555` |
 | `--menu-option-disabled-color` | `var(--color-text-disabled)` |
-

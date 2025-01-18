@@ -1,10 +1,10 @@
-import DatePicker from '..'
-import VarDatePicker from '../DatePicker'
-import dayjs from 'dayjs/esm'
-import { mount } from '@vue/test-utils'
 import { createApp } from 'vue'
-import { delay, mockConsole, triggerDrag, mockScrollIntoView } from '../../utils/test'
-import { expect, vi, test, describe } from 'vitest'
+import { mount } from '@vue/test-utils'
+import dayjs from 'dayjs/esm'
+import { describe, expect, test, vi } from 'vitest'
+import DatePicker from '..'
+import { delay, mockConsole, mockScrollIntoView, triggerDrag } from '../../utils/test'
+import VarDatePicker from '../DatePicker'
 
 mockScrollIntoView()
 
@@ -108,7 +108,7 @@ test('test datePicker style and type', async () => {
   wrapper.unmount()
 })
 
-test('test datePicker allowedDates', async () => {
+test('test datePicker allowedDates', () => {
   const wrapper = mount(VarDatePicker, {
     props: {
       allowedDates: (val) => parseInt(val.split('-')[2], 10) % 2 === 1,
@@ -419,6 +419,34 @@ test('test datePicker titleColor', async () => {
   })
   await delay(100)
   expect(wrapper.find('.var-date-picker__title').attributes('style')).toContain('background: green')
+
+  wrapper.unmount()
+})
+
+test('test datePicker rerender date panel when max or min changes', async () => {
+  const wrapper = mount({
+    components: {
+      [VarDatePicker.name]: VarDatePicker,
+    },
+    data() {
+      return {
+        date: '2020-12-23',
+        max: '2020-12-24',
+        min: '2020-12-22',
+      }
+    },
+    template: `<var-date-picker v-model="date" :min="min" :max="max" />`,
+  })
+
+  await delay(100)
+  expect(wrapper.html()).toMatchSnapshot()
+
+  await wrapper.setData({
+    min: '2020-01-05',
+    date: '2020-01-06',
+    max: '2020-01-07',
+  })
+  expect(wrapper.html()).toMatchSnapshot()
 
   wrapper.unmount()
 })

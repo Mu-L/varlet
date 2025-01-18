@@ -1,16 +1,16 @@
 <script setup>
-import Clipboard from 'clipboard'
+import { computed, onMounted, reactive, ref } from 'vue'
+import { AppType, onThemeChange, watchLang } from '@varlet/cli/client'
 import icons from '@varlet/icons'
 import { Snackbar } from '@varlet/ui'
-import { reactive, onMounted, ref, computed } from 'vue'
-import { AppType, watchLang, onThemeChange } from '@varlet/cli/client'
-import { use, t } from './locale'
+import Clipboard from 'clipboard'
+import { t, use } from './locale'
 
 const iconNames = reactive(icons)
 const iconName = ref('information')
 const searchText = ref('')
 const searchIcons = computed(() =>
-  searchText.value ? iconNames.filter((name) => name.includes(searchText.value)) : iconNames
+  searchText.value ? iconNames.filter((name) => name.includes(searchText.value)) : iconNames,
 )
 
 onMounted(() => {
@@ -41,14 +41,14 @@ function toggle() {
   <var-icon class="icon-example__animation-icon" name="checkbox-marked-circle" color="var(--color-success)" />
 
   <app-type>{{ t('useImage') }}</app-type>
-  <var-icon class="icon-example__animation-icon" name="https://varlet.gitee.io/varlet-ui/cat.jpg" :size="32" />
+  <var-icon class="icon-example__animation-icon" name="https://varletjs.org/cat.jpg" :size="32" />
 
   <app-type>{{ t('clickEvent') }}</app-type>
   <var-icon
     class="icon-example__animation-icon"
     name="checkbox-marked-circle"
     color="var(--color-primary)"
-    @click="() => Snackbar.success(t('clickSuccess'))"
+    @click="Snackbar.success(t('clickSuccess'))"
   />
 
   <app-type>{{ t('iconAnimation') }}</app-type>
@@ -73,11 +73,11 @@ function toggle() {
   <app-type>{{ t('iconList') }}</app-type>
 
   <var-input
+    v-model.trim="searchText"
     class="icon-example__search"
     size="small"
     variant="outlined"
     :placeholder="t('searchIcon')"
-    v-model.trim="searchText"
     clearable
   >
     <template #append-icon>
@@ -87,12 +87,12 @@ function toggle() {
 
   <div class="icon-example__icons">
     <div
+      v-for="name in searchIcons"
+      :key="name"
+      v-ripple
       class="icon-example__icon var-elevation--2"
       :style="{ background: 'var(--paper-background)' }"
       :data-clipboard-text="name"
-      :key="name"
-      v-for="name in searchIcons"
-      v-ripple
     >
       <var-icon :name="name" />
       <div class="icon-example__icon-name">{{ name }}</div>
@@ -129,7 +129,7 @@ function toggle() {
     margin: 0 2% 4%;
     border-radius: 10px;
     cursor: pointer;
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -webkit-tap-highlight-color: transparent;
     user-select: none;
     transition: background-color 0.25s;
   }

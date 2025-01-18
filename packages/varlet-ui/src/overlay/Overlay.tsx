@@ -1,14 +1,13 @@
 import { defineComponent, Teleport, Transition } from 'vue'
-import { props } from './props'
+import { call, preventDefault } from '@varlet/shared'
+import { useEventListener } from '@varlet/use'
 import { useLock } from '../context/lock'
+import { useStack } from '../context/stack'
 import { useZIndex } from '../context/zIndex'
 import { createNamespace, useTeleport } from '../utils/components'
-import { call, preventDefault } from '@varlet/shared'
-
+import { props } from './props'
 import '../styles/common.less'
 import './overlay.less'
-import { useStack } from '../context/stack'
-import { useEventListener } from '@varlet/use'
 
 const { name, n } = createNamespace('overlay')
 
@@ -17,13 +16,13 @@ export default defineComponent({
   inheritAttrs: false,
   props,
   setup(props, { slots, attrs }) {
-    const { zIndex } = useZIndex(() => props.show, 1)
+    const { zIndex } = useZIndex(() => props.show, 3)
     const { onStackTop } = useStack(() => props.show, zIndex)
     const { disabled } = useTeleport()
 
     useLock(
       () => props.show,
-      () => props.lockScroll
+      () => props.lockScroll,
     )
 
     useEventListener(() => window, 'keydown', handleKeydown)
@@ -53,12 +52,25 @@ export default defineComponent({
         <div
           class={n()}
           style={{
-            zIndex: zIndex.value,
+            zIndex: zIndex.value - 2,
           }}
           {...attrs}
-          onClick={handleClickOverlay}
         >
-          {call(slots.default)}
+          <div
+            class={n('overlay')}
+            style={{
+              zIndex: zIndex.value - 1,
+            }}
+            onClick={handleClickOverlay}
+          />
+          <div
+            class={n('content')}
+            style={{
+              zIndex: zIndex.value,
+            }}
+          >
+            {call(slots.default)}
+          </div>
         </div>
       )
     }

@@ -26,6 +26,30 @@ const value = ref()
 </template>
 ```
 
+### 选中事件
+
+```html
+<script setup>
+import { Snackbar } from '@varlet/ui'
+
+function handleSelect(value) {
+  Snackbar(`Select: ${value}`)
+}
+</script>
+
+<template>
+  <var-menu-select @select="handleSelect">
+    <var-button type="primary">请选择</var-button>
+
+    <template #options>
+      <var-menu-option label="吃饭" />
+      <var-menu-option label="睡觉" />
+      <var-menu-option label="打游戏" />
+    </template>
+  </var-menu-select>
+</template>
+```
+
 ### 尺寸
 
 ```html
@@ -213,6 +237,176 @@ const value = ref()
 </template>
 ```
 
+### 选项式 API
+
+可以将选项以数组形式传给 `options` 属性。
+
+```html
+<script setup>
+import { ref } from 'vue'
+
+const value = ref()
+const options = ref([
+  {
+    label: '吃饭',
+    value: 1,
+  },
+  {
+    label: '睡觉',
+    value: 2,
+  },
+  {
+    label: '打游戏',
+    value: 3,
+    disabled: true,
+  },
+])
+</script>
+
+<template>
+  <var-menu-select v-model="value" :options="options">
+    <var-button type="primary">{{ value ? value : '请选择' }}</var-button>
+  </var-menu-select>
+</template>
+```
+
+### 级联单选
+
+可以将选项数组传递给选项的 `children` 属性以实现级联效果。
+
+```html
+<script setup>
+import { ref } from 'vue'
+
+const value = ref()
+const options = ref([
+  {
+    label: '1',
+    value: 1,
+  },
+  {
+    label: '2',
+    value: 2,
+    children: [
+      {
+        label: '2-1',
+        value: 21,
+        children: [
+          {
+            label: '2-1-1',
+            value: 211,
+          },
+          {
+            label: '2-1-2',
+            value: 212,
+          },
+        ],
+      },
+      {
+        label: '2-2',
+        value: 22,
+      },
+    ],
+  },
+  {
+    label: '3',
+    value: 3,
+  },
+])
+</script>
+
+<template>
+  <var-menu-select v-model="value" :options="options">
+    <var-button type="primary">{{ value ? value : '请选择' }}</var-button>
+  </var-menu-select>
+</template>
+```
+
+### 级联多选
+
+在级联单选的基础上设置 `multiple` 属性即可实现级联多选。
+
+```html
+<script setup>
+import { ref } from 'vue'
+
+const value = ref()
+const options = ref([
+  {
+    label: '1',
+    value: 1,
+  },
+  {
+    label: '2',
+    value: 2,
+    children: [
+      {
+        label: '2-1',
+        value: 21,
+        children: [
+          {
+            label: '2-1-1',
+            value: 211,
+          },
+          {
+            label: '2-1-2',
+            value: 212,
+          },
+        ],
+      },
+      {
+        label: '2-2',
+        value: 22,
+      },
+    ],
+  },
+  {
+    label: '3',
+    value: 3,
+  },
+])
+</script>
+
+<template>
+  <var-menu-select multiple v-model="value" :options="options">
+    <var-button type="primary">{{ value ? value : '请选择' }}</var-button>
+  </var-menu-select>
+</template>
+```
+
+### 选项式 API（自定义字段）
+
+可以将选项以数组形式传给 `options` 属性，同时通过 `label-key` 和 `value-key` 属性指定选项数组内文本和值的字段。
+
+```html
+<script setup>
+import { ref } from 'vue'
+
+const value = ref()
+const options = ref([
+   {
+    name: '吃饭',
+    id: 1,
+  },
+  {
+    name: '睡觉',
+    id: 2,
+  },
+  {
+    name: '打游戏',
+    id: 3,
+    disabled: true,
+  },
+])
+</script>
+
+<template>
+  <var-menu-select v-model="value" :options="options" label-key="name" value-key="id">
+    <var-button type="primary">{{ value ? value : '请选择' }}</var-button>
+  </var-menu-select>
+</template>
+```
+
 ## API
 
 ### 属性
@@ -233,12 +427,26 @@ const value = ref()
 | `offset-y`      | y 轴偏移量， 相对于菜单对齐后的位置                                         | _number \| string_           | `0` |
 | `teleport`      | 菜单挂载的位置                                                     | _TeleportProps['to'] \| false_ | `body`            |
 | `disabled`      | 是否禁用菜单                                                      | _boolean_             | `false`           |
-| `trigger`       | 菜单触发方式，可选值为 `click` `hover`, `click` 为点击时触发, `hover` 为悬停时触发 | _string_              | `click`           |
-| `reference`       | 菜单关联的触发元素选择器，用于指定菜单的特定子元素为触发元素 | _string_              | `-`           |
+| `trigger`       | 菜单触发方式，可选值为 `click` `hover` `manual` | _string_              | `click`           |
+| `reference`       | 菜单关联的触发元素，`string` 类型为菜单组件的子孙元素选择器， `HTMLElement` 类型为任意指定的元素节点 | _string \| HTMLElement_ | `-`           |
 | `elevation` | 海拔高度，可选值为 `true` `false` 和 `0-24` 的等级 | _string \| number \| boolean_|   `true`    |
 | `same-width`    | 是否与触发元素同宽                                                   | _boolean_             | `false`           |
 | `popover-class` | 弹出层的 class                                                    | _string_             | `-`            |
 | `close-on-click-reference` | 是否在点击菜单触发元素后关闭菜单 | _boolean_ | `false` |
+| `options` ***3.3.7*** | 指定可选项 | _MenuSelectOption[]_ | `[]` |
+| `label-key` ***3.3.7*** | 作为 label 唯一标识的键名 | _string_ | `label` |
+| `value-key` ***3.3.7*** | 作为 value 唯一标识的键名 | _string_ | `value` |
+| `children-key` ***3.8.0*** | 作为 children 唯一标识的键名 | _string_ | `children` |
+
+#### MenuSelectOption
+
+| 参数 | 说明 | 类型             | 默认值       |
+| ------- | --- |----------------|-----------|
+| `label`    |    选项的标签    | _string \| VNode \| (option: MenuSelectOption, selected: boolean) => VNodeChild_      | `-`   |
+| `value`  |    选项的值    | _any_      | `-`   |
+| `children` ***3.8.0***  |    选项的子选项    | _MenuSelectOption[]_      | `-`   |
+| `disabled`    |    是否禁用   | _boolean_      | `-`   |
+| `ripple` | 是否启用水波效果 | _boolean_ | `true` |
 
 #### MenuOption Props
 
@@ -247,6 +455,7 @@ const value = ref()
 | `label` | 选项显示的文本 | _any_ | `-` |
 | `value` | 选项绑定的值 | _any_ | `-` |
 | `disabled` | 是否禁用 | _boolean_ | `false` |
+| `ripple` ***3.3.0***  | 是否启用水波效果 | _boolean_ | `true` |
 
 ### Placement
 
@@ -282,6 +491,7 @@ const value = ref()
 | `open` | 打开 MenuSelect | `-` | `-` |
 | `close` | 关闭 MenuSelect | `-` | `-` |
 | `resize` | MenuSelect 默认插槽元素产生位置大小变化时可以调用此方法进行重绘 | `-` | `-` |
+| `setReference` ***3.7.2*** | 设置 MenuSelect 关联的触发元素 | `reference: 与组件属性的 reference 一致` | `-` |
 
 ### 事件
 
@@ -294,6 +504,7 @@ const value = ref()
 | `close` | 关闭菜单时触发 | `-` |
 | `closed` | 关闭菜单动画结束时触发 | `-` |
 | `click-outside` | 点击菜单外部时触发 | `event: Event` |
+| `select` ***3.8.0*** | 选择某个选项时触发 | `value: any, option: MenuSelectOption` |
 
 ### 插槽
 
@@ -314,7 +525,7 @@ const value = ref()
 
 以下为组件使用的 css 变量，可以使用 [StyleProvider 组件](#/zh-CN/style-provider) 进行样式定制。
 
-#### Select Variables
+#### MenuSelect Variables
 
 | 变量名 | 默认值 |
 | --- | --- |
@@ -323,7 +534,7 @@ const value = ref()
 | `--menu-select-menu-border-radius` | `2px` |
 | `--menu-select-menu-background-color` | `var(--color-surface-container-high)` |
 
-#### Option Variables
+#### MenuOption Variables
 
 | 变量名 | 默认值 |
 | --- | --- |

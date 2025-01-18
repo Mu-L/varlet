@@ -1,9 +1,10 @@
-import Input from '..'
-import VarInput from '../Input'
-import { mount } from '@vue/test-utils'
 import { createApp, h } from 'vue'
+import { mount } from '@vue/test-utils'
+import { describe, expect, test, vi } from 'vitest'
+import { z } from 'zod'
+import Input from '..'
 import { delay } from '../../utils/test'
-import { expect, vi, describe, test } from 'vitest'
+import VarInput from '../Input'
 
 test('test input plugin', () => {
   const app = createApp({}).use(Input)
@@ -23,7 +24,7 @@ test('test input variant', () => {
     switch (variant) {
       case 'standard': {
         expect(
-          wrapper.find('.var-field-decorator__line').wrapperElement.querySelector('.var-field-decorator__dot')
+          wrapper.find('.var-field-decorator__line').wrapperElement.querySelector('.var-field-decorator__dot'),
         ).toBeTruthy()
         break
       }
@@ -67,7 +68,7 @@ test('test input type', () => {
     switch (type) {
       case 'number': {
         expect(wrapper.find('input').attributes('type')).toBe('text')
-        expect(wrapper.find('input').attributes('inputmode')).toBe('numeric')
+        expect(wrapper.find('input').attributes('inputmode')).toBe('decimal')
         break
       }
 
@@ -299,7 +300,7 @@ test('test input validation', async () => {
   const wrapper = mount(VarInput, {
     props: {
       modelValue: '',
-      rules: [(v) => v.length > 3 || '长度必须大于3'],
+      rules: [(v) => v.length > 3 || 'The length of value must be more than three'],
       'onUpdate:modelValue': onUpdateModelValue,
     },
   })
@@ -307,7 +308,38 @@ test('test input validation', async () => {
   await wrapper.find('.var-input__input').setValue('1')
   await wrapper.find('.var-input__input').trigger('input')
   await delay(16)
-  expect(wrapper.find('.var-form-details__error-message').text()).toBe('长度必须大于3')
+  expect(wrapper.find('.var-form-details__error-message').text()).toBe('The length of value must be more than three')
+  expect(wrapper.html()).toMatchSnapshot()
+
+  wrapper.vm.reset()
+  await delay(16)
+  expect(wrapper.props('modelValue')).toBe('')
+  expect(wrapper.html()).toMatchSnapshot()
+
+  await wrapper.find('.var-input__input').setValue('1234')
+  await wrapper.find('.var-input__input').trigger('input')
+  await delay(16)
+  expect(wrapper.find('.var-form-details__error-message').exists()).toBeFalsy()
+  expect(wrapper.html()).toMatchSnapshot()
+
+  wrapper.unmount()
+})
+
+test('test input validation with zod', async () => {
+  const onUpdateModelValue = vi.fn((value) => wrapper.setProps({ modelValue: value }))
+
+  const wrapper = mount(VarInput, {
+    props: {
+      modelValue: '',
+      rules: z.string().min(4, 'The length of value must be more than three'),
+      'onUpdate:modelValue': onUpdateModelValue,
+    },
+  })
+
+  await wrapper.find('.var-input__input').setValue('1')
+  await wrapper.find('.var-input__input').trigger('input')
+  await delay(16)
+  expect(wrapper.find('.var-form-details__error-message').text()).toBe('The length of value must be more than three')
   expect(wrapper.html()).toMatchSnapshot()
 
   wrapper.vm.reset()
@@ -336,7 +368,7 @@ test('test input trim', async () => {
   })
 
   await wrapper.find('.var-input__input').setValue('123 ')
-  await wrapper.find('.var-input__input').trigger('input')
+  await wrapper.find('.var-input__input').trigger('change')
 
   expect(onUpdateModelValue).lastCalledWith('123')
   wrapper.unmount()
@@ -368,17 +400,17 @@ describe('test input component slots', () => {
   test('test input extra slot', async () => {
     const wrapper = mount(VarInput, {
       slots: {
-        'extra-message': () => '还能输入10个字符',
+        'extra-message': () => 'There are ten characters that you can input',
       },
     })
 
     await delay(100)
-    expect(wrapper.find('.var-form-details__extra-message').text()).toBe('还能输入10个字符')
+    expect(wrapper.find('.var-form-details__extra-message').text()).toBe('There are ten characters that you can input')
 
     wrapper.unmount()
   })
 
-  test('test input append-icon slot', async () => {
+  test('test input append-icon slot', () => {
     const wrapper = mount(VarInput, {
       slots: {
         'append-icon': () => 'append-icon',
@@ -390,7 +422,7 @@ describe('test input component slots', () => {
     wrapper.unmount()
   })
 
-  test('test input prepend-icon slot', async () => {
+  test('test input prepend-icon slot', () => {
     const wrapper = mount(VarInput, {
       slots: {
         'prepend-icon': () => 'prepend-icon',
@@ -418,4 +450,18 @@ describe('test input component slots', () => {
 
     wrapper.unmount()
   })
+})
+
+test('test input aria-label', async () => {
+  const wrapper = mount(VarInput, {
+    props: {
+      modelValue: 'text',
+      ariaLabel: 'test aria-label',
+    },
+  })
+
+  await delay(100)
+  expect(wrapper.find('.var-input__input').attributes('aria-label')).toBe('test aria-label')
+  expect(wrapper.html()).toMatchSnapshot()
+  wrapper.unmount()
 })

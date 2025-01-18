@@ -1,9 +1,9 @@
-import Card from '..'
-import VarCard from '../Card'
+import { createApp, h } from 'vue'
 import { mount } from '@vue/test-utils'
-import { createApp } from 'vue'
+import { describe, expect, test, vi } from 'vitest'
+import Card from '..'
 import { delay } from '../../utils/test'
-import { expect, vi, describe, test } from 'vitest'
+import VarCard from '../Card'
 
 test('test card use', () => {
   const app = createApp({}).use(Card)
@@ -97,18 +97,49 @@ describe('test card component props', () => {
   })
 
   test('test card outline', async () => {
+    const wrapper = mount(VarCard)
+
+    expect(wrapper.find('.var-card--outline').exists()).toBe(false)
+
+    await wrapper.setProps({
+      outline: true,
+    })
+    expect(wrapper.find('.var-card--outline').exists()).toBe(true)
+    expect(wrapper.find('.var-elevation--1').exists()).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  test('test card outlined variant', async () => {
     const wrapper = mount(VarCard, {
       props: {
-        outline: true,
+        variant: 'outlined',
       },
     })
 
     expect(wrapper.find('.var-card--outline').exists()).toBe(true)
 
     await wrapper.setProps({
-      outline: false,
+      variant: 'standard',
     })
     expect(wrapper.find('.var-card--outline').exists()).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  test('test card filled variant', async () => {
+    const wrapper = mount(VarCard, {
+      props: {
+        variant: 'filled',
+      },
+    })
+
+    expect(wrapper.find('.var-card--filled').exists()).toBe(true)
+
+    await wrapper.setProps({
+      variant: 'standard',
+    })
+    expect(wrapper.find('.var-card--filled').exists()).toBe(false)
 
     wrapper.unmount()
   })
@@ -116,16 +147,16 @@ describe('test card component props', () => {
   test('test card src', async () => {
     const wrapper = mount(VarCard, {
       props: {
-        src: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+        src: 'https://varletjs.org/varlet/cat.jpg',
       },
     })
 
-    expect(wrapper.find('img').attributes('src')).toBe('https://varlet.gitee.io/varlet-ui/cat.jpg')
+    expect(wrapper.find('img').attributes('src')).toBe('https://varletjs.org/varlet/cat.jpg')
 
     await wrapper.setProps({
-      src: 'https://varlet.gitee.io/varlet-ui/cat2.jpg',
+      src: 'https://varletjs.org/varlet/cat2.jpg',
     })
-    expect(wrapper.find('img').attributes('src')).toBe('https://varlet.gitee.io/varlet-ui/cat2.jpg')
+    expect(wrapper.find('img').attributes('src')).toBe('https://varletjs.org/varlet/cat2.jpg')
 
     wrapper.unmount()
   })
@@ -135,7 +166,7 @@ describe('test card component props', () => {
       const wrapper = mount(VarCard, {
         props: {
           fit,
-          src: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+          src: 'https://varletjs.org/varlet/cat.jpg',
         },
       })
 
@@ -148,7 +179,7 @@ describe('test card component props', () => {
     const wrapper = mount(VarCard, {
       props: {
         alt: 'This is alt',
-        src: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+        src: 'https://varletjs.org/varlet/cat.jpg',
       },
     })
 
@@ -166,7 +197,7 @@ describe('test card component props', () => {
     const wrapper = mount(VarCard, {
       props: {
         imageHeight: 100,
-        src: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+        src: 'https://varletjs.org/varlet/cat.jpg',
       },
     })
 
@@ -184,7 +215,7 @@ describe('test card component props', () => {
     const wrapper = mount(VarCard, {
       props: {
         imageWidth: 100,
-        src: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+        src: 'https://varletjs.org/varlet/cat.jpg',
       },
     })
 
@@ -232,7 +263,7 @@ describe('test card component slots', () => {
   test('test card image slot', () => {
     const wrapper = mount(VarCard, {
       slots: {
-        image: '<img src="https://varlet.gitee.io/varlet-ui/cat.jpg" alt="cat" />',
+        image: '<img src="https://varletjs.org/varlet/cat.jpg" alt="cat" />',
       },
     })
 
@@ -241,10 +272,22 @@ describe('test card component slots', () => {
     wrapper.unmount()
   })
 
+  test('test card default slot', () => {
+    const wrapper = mount(VarCard, {
+      slots: {
+        default: 'default slot',
+      },
+    })
+
+    expect(wrapper.find('.var-card__content').text()).toBe('default slot')
+
+    wrapper.unmount()
+  })
+
   test('test card title slot', () => {
     const wrapper = mount(VarCard, {
       slots: {
-        title: '<span>title</span>',
+        title: ({ slotClass }) => h('span', { class: slotClass }, 'title'),
       },
     })
 
@@ -256,7 +299,7 @@ describe('test card component slots', () => {
   test('test card subtitle slot', () => {
     const wrapper = mount(VarCard, {
       slots: {
-        subtitle: '<span>subtitle</span>',
+        subtitle: ({ slotClass }) => h('span', { class: slotClass }, 'subtitle'),
       },
     })
 
@@ -268,7 +311,7 @@ describe('test card component slots', () => {
   test('test card description slot', () => {
     const wrapper = mount(VarCard, {
       slots: {
-        description: '<span>description</span>',
+        description: ({ slotClass }) => h('span', { class: slotClass }, 'description'),
       },
     })
 

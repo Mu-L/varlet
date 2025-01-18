@@ -1,17 +1,17 @@
-import Menu from '..'
-import VarMenu from '../Menu'
 import { createApp } from 'vue'
-import { mount } from '@vue/test-utils'
-import { delay, mockStubs, trigger, triggerKeyboard } from '../../utils/test'
 import { doubleRaf } from '@varlet/shared'
-import { expect, vi, test } from 'vitest'
+import { mount } from '@vue/test-utils'
+import { expect, test, vi } from 'vitest'
+import Menu from '..'
+import { delay, mockStubs, trigger, triggerKeyboard } from '../../utils/test'
+import VarMenu from '../Menu'
 
 test('test menu plugin', () => {
   const app = createApp({}).use(Menu)
   expect(app.component(Menu.name)).toBeTruthy()
 })
 
-test('test menu placement', async () => {
+test('test menu placement', () => {
   ;[
     'top',
     'top-start',
@@ -68,6 +68,27 @@ test('test menu click trigger', async () => {
   expect(document.body.innerHTML).toMatchSnapshot()
 
   document.body.innerHTML = ''
+
+  mockRestore()
+})
+
+test('test menu manual trigger', async () => {
+  const { mockRestore } = mockStubs()
+
+  const root = document.createElement('div')
+
+  const wrapper = mount(VarMenu, {
+    props: {
+      trigger: 'manual',
+      teleport: root,
+    },
+  })
+
+  await doubleRaf()
+  await wrapper.trigger('click')
+  await trigger(root.querySelector('.var-menu__menu'), 'mouseenter')
+  await delay(300)
+  expect(root.innerHTML).toMatchSnapshot()
 
   mockRestore()
 })

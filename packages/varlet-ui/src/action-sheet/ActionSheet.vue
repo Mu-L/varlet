@@ -1,5 +1,6 @@
 <template>
   <var-popup
+    v-model:show="show"
     position="bottom"
     :class="n('popup-radius')"
     :overlay="overlay"
@@ -10,7 +11,6 @@
     :close-on-key-escape="closeOnKeyEscape"
     :teleport="teleport"
     :safe-area="safeArea"
-    v-model:show="show"
     @open="onOpen"
     @close="onClose"
     @closed="onClosed"
@@ -20,7 +20,7 @@
   >
     <div :class="classes(n(), n('$--box'))" v-bind="$attrs">
       <slot name="title">
-        <div :class="n('title')">{{ title ?? t('actionSheetTitle') }}</div>
+        <div :class="n('title')">{{ title ?? (pt ? pt : t)('actionSheetTitle') }}</div>
       </slot>
 
       <slot name="actions">
@@ -41,16 +41,17 @@
 </template>
 
 <script lang="ts">
-import Ripple from '../ripple'
-import VarPopup from '../popup'
-import VarActionItem from './ActionItem.vue'
 import { defineComponent } from 'vue'
-import { props } from './props'
-import { t } from '../locale'
-import { createNamespace } from '../utils/components'
 import { call } from '@varlet/shared'
 import { useVModel } from '@varlet/use'
+import { t } from '../locale'
+import { injectLocaleProvider } from '../locale-provider/provide'
+import VarPopup from '../popup'
+import Ripple from '../ripple'
+import { createNamespace } from '../utils/components'
+import VarActionItem from './ActionItem.vue'
 import { type ActionItem } from './index'
+import { props } from './props'
 
 const { name, n, classes } = createNamespace('action-sheet')
 
@@ -65,6 +66,7 @@ export default defineComponent({
   props,
   setup(props) {
     const show = useVModel(props, 'show')
+    const { t: pt } = injectLocaleProvider()
 
     function handleSelect(action: ActionItem) {
       if (action.disabled) {
@@ -81,6 +83,7 @@ export default defineComponent({
 
     return {
       show,
+      pt,
       t,
       n,
       classes,

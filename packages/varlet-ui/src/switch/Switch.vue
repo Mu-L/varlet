@@ -1,24 +1,27 @@
 <template>
-  <div :class="n()" v-hover:desktop="hover">
+  <div
+    v-hover:desktop="hover"
+    :class="classes(n(), [variant, n('--variant')])"
+    role="switch"
+    :aria-checked="modelValue"
+  >
     <div
       ref="switchRef"
-      :class="classes(n('block'), [disabled || formDisabled, n('--disabled')])"
+      :class="classes(n('block'), [disabled || formDisabled, n('--disabled')], [isActive, n('block--active')])"
       :style="styleComputed.switch"
       @click="switchActive"
     >
       <div
         :style="styleComputed.track"
-        :class="
-          classes(n('track'), [modelValue === activeValue, n('track--active')], [errorMessage, n('track--error')])
-        "
+        :class="classes(n('track'), [isActive, n('track--active')], [errorMessage && !variant, n('track--error')])"
       ></div>
       <div
-        :class="classes(n('ripple'), [modelValue === activeValue, n('ripple--active')])"
-        :style="styleComputed.ripple"
-        :tabindex="disabled || formDisabled ? undefined : '0'"
         v-ripple="{
           disabled: !ripple || disabled || loading || formDisabled || readonly || formReadonly,
         }"
+        :class="classes(n('ripple'), [isActive, n('ripple--active')])"
+        :style="styleComputed.ripple"
+        :tabindex="disabled || formDisabled ? undefined : '0'"
         @focus="isFocusing = true"
         @blur="isFocusing = false"
       >
@@ -27,9 +30,10 @@
           :class="
             classes(
               n('handle'),
-              n('$-elevation--2'),
-              [modelValue === activeValue, n('handle--active')],
-              [errorMessage, n('handle--error')]
+              formatElevation(buttonElevation, 2),
+              [isActive, n('handle--active')],
+              [errorMessage && !variant, n('handle--error')],
+              [hovering, n('handle--hover')],
             )
           "
         >
@@ -58,17 +62,17 @@
 </template>
 
 <script lang="ts">
-import VarFormDetails from '../form-details'
-import Ripple from '../ripple'
-import Hover from '../hover'
-import VarHoverOverlay, { useHoverOverlay } from '../hover-overlay'
-import { defineComponent, computed, nextTick, ref } from 'vue'
-import { useValidation, createNamespace } from '../utils/components'
-import { multiplySizeUnit } from '../utils/elements'
-import { useForm } from '../form/provide'
-import { props, type ValidateTrigger } from './props'
+import { computed, defineComponent, nextTick, ref } from 'vue'
 import { call, preventDefault } from '@varlet/shared'
 import { useEventListener } from '@varlet/use'
+import VarFormDetails from '../form-details'
+import { useForm } from '../form/provide'
+import Hover from '../hover'
+import VarHoverOverlay, { useHoverOverlay } from '../hover-overlay'
+import Ripple from '../ripple'
+import { createNamespace, formatElevation, useValidation } from '../utils/components'
+import { multiplySizeUnit } from '../utils/elements'
+import { props, type SwitchValidateTrigger } from './props'
 import { type SwitchProvider } from './provide'
 
 const { name, n, classes } = createNamespace('switch')
@@ -96,32 +100,36 @@ export default defineComponent({
     const { bindForm, form } = useForm()
     const { errorMessage, validateWithTrigger: vt, validate: v, resetValidation } = useValidation()
     const { hovering, handleHovering } = useHoverOverlay()
+
+    const isActive = computed(() => props.modelValue === props.activeValue)
+
     const styleComputed = computed<Record<string, Partial<StyleProps>>>(() => {
-      const { size, modelValue, color, closeColor, loadingColor, activeValue } = props
+      const { size, color, closeColor, loadingColor, variant } = props
 
       return {
         handle: {
           width: multiplySizeUnit(size),
           height: multiplySizeUnit(size),
-          backgroundColor: modelValue === activeValue ? color : closeColor,
+          backgroundColor: isActive.value ? color : closeColor,
           color: loadingColor,
         },
         ripple: {
-          left: modelValue === activeValue ? multiplySizeUnit(size, 0.5) : `-${multiplySizeUnit(size, 0.5)}`,
-          color: modelValue === activeValue ? color : closeColor || 'currentColor',
+          left: isActive.value ? multiplySizeUnit(size, 0.5) : `-${multiplySizeUnit(size, variant ? 1 / 3 : 0.5)}`,
+          color: isActive.value ? color : closeColor || 'currentColor',
           width: multiplySizeUnit(size, 2),
           height: multiplySizeUnit(size, 2),
         },
         track: {
-          height: multiplySizeUnit(size, 0.72),
-          width: multiplySizeUnit(size, 1.9),
+          width: multiplySizeUnit(size, variant ? 13 / 6 : 1.9),
+          height: multiplySizeUnit(size, variant ? 4 / 3 : 0.72),
           borderRadius: multiplySizeUnit(size, 2 / 3),
-          filter: modelValue === activeValue || errorMessage?.value ? undefined : 'brightness(.6)',
-          backgroundColor: modelValue === activeValue ? color : closeColor,
+          filter: isActive.value || errorMessage?.value ? undefined : `brightness(${variant ? 1 : 0.6})`,
+          backgroundColor: isActive.value ? color : closeColor,
+          borderWidth: variant && !isActive.value ? multiplySizeUnit(size, 1 / 12) : undefined,
         },
         switch: {
-          height: multiplySizeUnit(size, 1.2),
-          width: multiplySizeUnit(size, 2),
+          width: multiplySizeUnit(size, variant ? 13 / 6 : 2),
+          height: multiplySizeUnit(size, variant ? 4 / 3 : 1.2),
         },
       }
     })
@@ -166,7 +174,7 @@ export default defineComponent({
       return v(props.rules, props.modelValue)
     }
 
-    function validateWithTrigger(trigger: ValidateTrigger) {
+    function validateWithTrigger(trigger: SwitchValidateTrigger) {
       nextTick(() => {
         const { validateTrigger, rules, modelValue } = props
         vt(validateTrigger, trigger, rules, modelValue)
@@ -180,7 +188,6 @@ export default defineComponent({
         disabled,
         loading,
         readonly,
-        modelValue,
         activeValue,
         inactiveValue,
         lazyChange,
@@ -198,7 +205,7 @@ export default defineComponent({
         return
       }
 
-      const newValue = modelValue === activeValue ? inactiveValue : activeValue
+      const newValue = isActive.value ? inactiveValue : activeValue
 
       if (lazyChange) {
         call(onBeforeChange, newValue, (value) => {
@@ -226,6 +233,7 @@ export default defineComponent({
     }
 
     return {
+      isActive,
       switchRef,
       hovering,
       isFocusing,
@@ -236,6 +244,7 @@ export default defineComponent({
       formReadonly: form?.readonly,
       n,
       classes,
+      formatElevation,
       multiplySizeUnit,
       switchActive,
       hover,

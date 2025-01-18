@@ -9,6 +9,7 @@ Display and select the content through the drop-down menu.
 ```html
 <script setup>
 import { ref } from 'vue'
+import { z } from 'zod'
 
 const value = ref()
 const value2 = ref()
@@ -23,6 +24,43 @@ const value10 = ref([])
 const value11 = ref()
 const value12 = ref([])
 const value13 = ref()
+const value14 = ref()
+const value15 = ref([])
+const value16 = ref()
+const value17 = ref()
+const value18 = ref([])
+
+const options = ref([
+  {
+    label: 'Eat',
+    value: 1,
+  },
+  {
+    label: 'Sleep',
+    value: 2,
+  },
+  {
+    label: 'Play game',
+    value: 3,
+    disabled: true,
+  },
+])
+
+const keyOptions = ref([
+  {
+    name: 'Eat',
+    id: 1,
+  },
+  {
+    name: 'Sleep',
+    id: 2,
+  },
+  {
+    name: 'Play game',
+    id: 3,
+    disabled: true,
+  },
+])
 </script>
 
 <template>
@@ -121,8 +159,17 @@ const value13 = ref()
     </var-select>
     <var-select
       placeholder="Validate"
-      :rules="[(v) => v === 'Rest' || 'You must choose to rest']"
+      :rules="v => v === 'Rest' || 'You must choose to rest'"
       v-model="value11"
+    >
+      <var-option label="Eat" />
+      <var-option label="Sleep" />
+      <var-option label="Rest" />
+    </var-select>
+    <var-select
+      placeholder="Validate With Zod"
+      :rules="z.string().refine(v => v === 'Rest', 'You must choose to rest')"
+      v-model="value17"
     >
       <var-option label="Eat" />
       <var-option label="Sleep" />
@@ -131,8 +178,19 @@ const value13 = ref()
     <var-select
       multiple
       placeholder="Multiple Validate"
-      :rules="[(v) => v.length >= 2 || 'You select at least two options']"
+      :rules="v => v.length >= 2 || 'You select at least two options'"
       v-model="value12"
+    >
+      <var-option label="Eat" />
+      <var-option label="Sleep" />
+      <var-option label="Play game" />
+      <var-option label="Coding" />
+    </var-select>
+    <var-select
+      multiple
+      placeholder="Multiple Validate With Zod"
+      :rules="z.array(z.string()).min(2, 'You select at least two options')"
+      v-model="value18"
     >
       <var-option label="Eat" />
       <var-option label="Sleep" />
@@ -143,6 +201,9 @@ const value13 = ref()
       <var-option label="Eat" />
       <var-option label="Sleep" />
     </var-select>
+    <var-select placeholder="Options API" v-model="value14" :options="options" />
+    <var-select placeholder="Options API" v-model="value15" :options="options" multiple />
+    <var-select placeholder="Custom Fields" v-model="value16" :options="keyOptions" label-key="name" value-key="id" />
   </var-space>
 </template>
 
@@ -170,6 +231,7 @@ const value13 = ref()
 ```html
 <script setup>
 import { ref } from 'vue'
+import { z } from 'zod'
 
 const value = ref()
 const value2 = ref()
@@ -184,6 +246,43 @@ const value10 = ref([])
 const value11 = ref()
 const value12 = ref([])
 const value13 = ref()
+const value14 = ref()
+const value15 = ref([])
+const value16 = ref()
+const value17 = ref()
+const value18 = ref([])
+
+const options = ref([
+  {
+    label: 'Eat',
+    value: 1,
+  },
+  {
+    label: 'Sleep',
+    value: 2,
+  },
+  {
+    label: 'Play game',
+    value: 3,
+    disabled: true,
+  },
+])
+
+const keyOptions = ref([
+  {
+    name: 'Eat',
+    id: 1,
+  },
+  {
+    name: 'Sleep',
+    id: 2,
+  },
+  {
+    name: 'Play game',
+    id: 3,
+    disabled: true,
+  },
+])
 </script>
 
 <template>
@@ -283,8 +382,18 @@ const value13 = ref()
     <var-select
       variant="outlined"
       placeholder="Validate"
-      :rules="[(v) => v === 'Rest' || 'You must choose to rest']"
+      :rules="v => v === 'Rest' || 'You must choose to rest'"
       v-model="value11"
+    >
+      <var-option label="Eat" />
+      <var-option label="Sleep" />
+      <var-option label="Rest" />
+    </var-select>
+    <var-select
+      variant="outlined"
+      placeholder="Validate With Zod"
+      :rules="z.string().refine(v => v === 'Rest', 'You must choose to rest')"
+      v-model="value17"
     >
       <var-option label="Eat" />
       <var-option label="Sleep" />
@@ -294,8 +403,20 @@ const value13 = ref()
       variant="outlined"
       multiple
       placeholder="Multiple Validate"
-      :rules="[(v) => v.length >= 2 || 'You select at least two options']"
+      :rules="v => v.length >= 2 || 'You select at least two options'"
       v-model="value12"
+    >
+      <var-option label="Eat" />
+      <var-option label="Sleep" />
+      <var-option label="Play game" />
+      <var-option label="Coding" />
+    </var-select>
+    <var-select
+      variant="outlined"
+      multiple
+      placeholder="Multiple Validate With Zod"
+      :rules="z.array(z.string()).min(2, 'You select at least two options')"
+      v-model="value18"
     >
       <var-option label="Eat" />
       <var-option label="Sleep" />
@@ -306,6 +427,9 @@ const value13 = ref()
       <var-option label="Eat" />
       <var-option label="Sleep" />
     </var-select>
+    <var-select variant="outlined" placeholder="Options API" v-model="value14" :options="options" />
+    <var-select variant="outlined" placeholder="Options API" v-model="value15" :options="options" multiple />
+    <var-select variant="outlined" placeholder="Custom Fields" v-model="value16" :options="keyOptions" label-key="name" value-key="id" />
   </var-space>
 </template>
 
@@ -351,8 +475,20 @@ const value13 = ref()
 | `readonly` | Whether the readonly | _boolean_ | `false` |
 | `disabled` | Whether the disabled | _boolean_ | `false` |
 | `clearable` | Whether the clearable | _boolean_ | `false` |
-| `validate-trigger` | Timing to trigger validation, optional value is `onFocus` `onBlur` `onChange` `onClick` `onClear` `onClose` | _ValidateTriggers[]_ | `['onChange', 'onClear', 'onClose']` |
-| `rules` | The validation rules, return `true` to indicate that the validation passed, The remaining values are converted to text as user prompts | _Array<(v: any \| any[]) => any>_ | `-` |
+| `options` ***3.3.4*** | Specifies options | _SelectOption[]_ | `[]` |
+| `label-key` ***3.3.4*** | As the key that uniquely identifies label | _string_ | `label` |
+| `value-key` ***3.3.4*** | As the key that uniquely identifies value | _string_ | `value` |
+| `validate-trigger` | Timing to trigger validation, optional value is `onFocus` `onBlur` `onChange` `onClick` `onClear` `onClose` | _SelectValidateTrigger[]_ | `['onChange', 'onClear', 'onClose']` |
+| `rules` | Validation rules, return `true` to indicate verification passes, other types of values ​​will be converted into text as user prompts. [Zod validation](#/en-US/zodValidation) is supported since `3.5.0` | _((v: any) => any) \| ZodType \| Array<((v: any) => any) \| ZodType>_ | `-` |
+
+#### SelectOption
+
+| Prop | Description | Type | Default |
+| ------- | --- |----------------|-----------|
+| `label`    |   The text of option    | _string \| VNode \| (option: SelectOption, selected: boolean) => VNodeChild_      | `-`   |
+| `value`  |    The value of option    | _any_      | `-`   |
+| `disabled`    |    Whether to disable option   | _boolean_      | `-`   |
+| `ripple` ***3.3.0***  | Whether to enable ripple | _boolean_ | `true` |
 
 #### Option Props
 
@@ -395,7 +531,7 @@ const value13 = ref()
 | --- | --- | --- |
 | `selected` | Select the contents of the area | `-` |
 | `prepend-icon` | Prepend icon | `-` |
-| `clear-icon` | Clear Icon | `clear: (e: Event) => void` clear function (can be used to clear select box contents when using slots) | 
+| `clear-icon` | Clear Icon | `clear: (e: Event) => void` clear function (can be used to clear select box contents when using slots) |
 | `append-icon` | Append icon | `-` |
 | `arrow-icon` | Arrow icon | `focus: boolean` Whether to focus, `menu-open: boolean` Whether menu opened |
 
@@ -403,9 +539,10 @@ const value13 = ref()
 
 | Name | Description | SlotProps |
 | --- | --- | --- |
-| `default` | Options to display the content | `-` |
+| `default` | Options to display the content | `selected: boolean` selected or not |
 
 ### Style Variables
+
 Here are the CSS variables used by the component. Styles can be customized using [StyleProvider](#/en-US/style-provider).
 
 #### Select Variables

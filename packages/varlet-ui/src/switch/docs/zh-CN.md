@@ -93,7 +93,22 @@ const value = ref(true)
 </script>
 
 <template>
-  <var-switch v-model="value" :rules="[(v) => v === true || '错误！']"/>
+  <var-switch v-model="value" :rules="v => v === true || '错误!'"/>
+</template>
+```
+
+### 使用 Zod 校验
+
+```html
+<script setup>
+import { ref } from 'vue'
+import { z } from 'zod'
+
+const value = ref(true)
+</script>
+
+<template>
+  <var-switch v-model="value" :rules="z.boolean().refine(v => v === true, '错误!')" />
 </template>
 ```
 
@@ -123,6 +138,20 @@ function handleBeforeChange(value, change) {
 </template>
 ```
 
+### 变体
+
+```html
+<script setup>
+import { ref } from 'vue'
+
+const value = ref(true)
+</script>
+
+<template>
+  <var-switch variant v-model="value" />
+</template>
+```
+
 ## API
 
 ### 属性
@@ -136,13 +165,15 @@ function handleBeforeChange(value, change) {
 | `readonly`       | 是否只读 | _boolean_ | `false` |
 | `loading`        | 是否为加载状态 | _boolean_ | `false` |
 | `ripple`         | 是否启用水波纹 | _boolean_ | `true` |
+| `button-elevation` ***3.2.7*** | 控制按钮的海拔效果 | _boolean_ | `true` |
 | `color`          | 打开状态下的颜色 | _string_ | `-` |
 | `loading-color`  | 加载图标的颜色 | _string_ | `-` |
 | `close-color`    | 关闭状态下的颜色 | _string_ | `-` |
 | `size`           | switch 的大小 | _string \| number_ | `-` |
-| `rules`          | 校验规则 | _Array<(value: any) => any>_  | `-` |
+| `rules` | 验证规则，返回 `true` 表示验证通过，其它类型的值将转换为文本作为用户提示。自 `3.5.0` 开始支持 [Zod 验证](#/zh-CN/zodValidation)  | _((v: any) => any) \| ZodType \| Array<((v: any) => any) \| ZodType>_ | `-` |
 | `lazy-change`    | 是否允许触发 `before-change` 事件 | _boolean_  | `false` |
-| `validate-trigger` | 触发验证的时机，可选值为 `onChange` `onLazyChange` | _ValidateTriggers[]_ | `['onChange', 'onLazyChange']` |
+| `validate-trigger` | 触发验证的时机，可选值为 `onChange` `onLazyChange` | _SwitchValidateTrigger[]_ | `['onChange', 'onLazyChange']` |
+| `variant` ***3.2.3*** | 变体模式 | _boolean_ | `false` |
 
 ### 事件
 
@@ -162,8 +193,32 @@ function handleBeforeChange(value, change) {
 | `--switch-track-active-background` | `var(--color-primary)` |
 | `--switch-track-error-background` | `var(--color-danger)` |
 | `--switch-ripple-color` | `var(--color-primary)` |
-| `--switch-handle-background` | `#fff` |
-| `--switch-handle-color` | `#fff` |
+| `--switch-handle-background` | `var(--color-on-primary)` |
+| `--switch-handle-color` | `var(--color-primary)` |
+| `--switch-handle-active-color` | `var(--color-on-primary)` |
 | `--switch-handle-active-background` | `var(--color-primary)` |
 | `--switch-handle-error-background` | `var(--color-danger)` |
 | `--switch-disabled-opacity` | `var(--opacity-disabled)` |
+| `--switch-variant-width` | `52px` |
+| `--switch-variant-height` | `32px` |
+| `--switch-variant-track-border-color` | `#888` |
+| `--switch-variant-track-background` | `var(--color-surface-container-highest)` |
+| `--switch-variant-handle-width` | `24px` |
+| `--switch-variant-handle-height` | `24px` |
+| `--switch-variant-handle-color` | `var(--color-on-primary)` |
+| `--switch-variant-handle-active-color` | `var(--color-primary)` |
+| `--switch-variant-handle-background` | `#888` |
+| `--switch-variant-handle-active-background` | `var(--color-on-primary)` |
+| `--switch-width` | `40px` |
+| `--switch-height` | `24px` |
+| `--switch-track-width` | `38px` |
+| `--switch-track-height` | `14.4px` |
+| `--switch-track-border-radius` | `calc(20px * 2 / 3)` |
+| `--switch-handle-width` | `20px` |
+| `--switch-handle-height` | `20px` |
+| `--switch-ripple-size` | `40px` |
+| `--switch-ripple-left` | `-10px` |
+| `--switch-ripple-active-left` | `10px` |
+| `--switch-loading-size` | `16px` |
+| `--switch-variant-ripple-left` | `-4px` |
+| `--switch-variant-ripple-active-left` | `16px` |

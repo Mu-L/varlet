@@ -1,7 +1,7 @@
-import enUS from '../en-US'
+import { expect, test, vi } from 'vitest'
 import { useLocale } from '..'
 import { mockConsole } from '../../utils/test'
-import { expect, vi, test } from 'vitest'
+import enUS from '../en-US'
 
 test('test add lang', () => {
   const { add, use, t, messages } = useLocale()
@@ -15,7 +15,7 @@ test('test add lang', () => {
   use(lang)
 
   expect(t('lang')).toBe(lang)
-  expect(messages[lang]).toBe(message)
+  expect(messages.value[lang]).toStrictEqual(message)
 })
 
 test('test merge lang', () => {

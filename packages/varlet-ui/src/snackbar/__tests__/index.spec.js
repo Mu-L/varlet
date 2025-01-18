@@ -1,8 +1,8 @@
+import { createApp } from 'vue'
+import { expect, test, vi } from 'vitest'
+import { delay } from '../../utils/test'
 import Snackbar from '../index'
 import VarSnackbar from '../Snackbar'
-import { createApp } from 'vue'
-import { delay } from '../../utils/test'
-import { expect, vi, test } from 'vitest'
 
 test('test snackbar plugin', () => {
   const app = createApp({}).use(Snackbar)
@@ -20,6 +20,24 @@ test('test snackbar functional', async () => {
   clear()
   await delay(200)
   expect(document.body.querySelector('.var-snackbar')).toBeFalsy()
+
+  Snackbar.clear()
+})
+
+test('test snackbar elevation', async () => {
+  expect(document.body.querySelector('.var-snackbar')).toBeFalsy()
+
+  const { clear } = Snackbar({
+    content: 'test snackbar',
+    elevation: 5,
+  })
+
+  await delay(200)
+  expect(document.body.querySelector('.var-elevation--5')).toBeTruthy()
+
+  clear()
+  await delay(200)
+  expect(document.body.querySelector('.var-elevation--5')).toBeFalsy()
 
   Snackbar.clear()
 })

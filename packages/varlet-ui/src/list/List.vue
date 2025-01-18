@@ -1,38 +1,39 @@
 <template>
-  <div :class="classes(n(), n('$--box'))" ref="listEl">
+  <div ref="listEl" :class="classes(n(), n('$--box'))">
     <slot />
 
-    <slot name="loading" v-if="loading">
+    <slot v-if="loading" name="loading">
       <div :class="n('loading')">
-        <div :class="n('loading-text')">{{ loadingText ?? t('listLoadingText') }}</div>
+        <div :class="n('loading-text')">{{ loadingText ?? (pt ? pt : t)('listLoadingText') }}</div>
         <var-loading size="mini" :radius="10" />
       </div>
     </slot>
 
-    <slot name="finished" v-if="finished">
-      <div :class="n('finished')">{{ finishedText ?? t('listFinishedText') }}</div>
+    <slot v-if="finished" name="finished">
+      <div :class="n('finished')">{{ finishedText ?? (pt ? pt : t)('listFinishedText') }}</div>
     </slot>
 
-    <slot name="error" v-if="error">
-      <div :class="n('error')" v-ripple @click="load">
-        {{ errorText ?? t('listErrorText') }}
+    <slot v-if="error" name="error">
+      <div v-ripple :class="n('error')" @click="load">
+        {{ errorText ?? (pt ? pt : t)('listErrorText') }}
       </div>
     </slot>
 
-    <div :class="n('detector')" ref="detectorEl"></div>
+    <div ref="detectorEl" :class="n('detector')"></div>
   </div>
 </template>
 
 <script lang="ts">
+import { defineComponent, nextTick, ref, watch } from 'vue'
+import { call, getRect, isNumber } from '@varlet/shared'
+import { onSmartMounted, onSmartUnmounted } from '@varlet/use'
 import VarLoading from '../loading'
+import { t } from '../locale'
+import { injectLocaleProvider } from '../locale-provider/provide'
 import Ripple from '../ripple'
-import { defineComponent, ref, nextTick, watch } from 'vue'
+import { createNamespace } from '../utils/components'
 import { getParentScroller, toPxNum } from '../utils/elements'
 import { props } from './props'
-import { isNumber, getRect, call } from '@varlet/shared'
-import { createNamespace } from '../utils/components'
-import { t } from '../locale'
-import { onSmartMounted, onSmartUnmounted } from '@varlet/use'
 import { useTabItem } from './provide'
 
 const { name, n, classes } = createNamespace('list')
@@ -46,6 +47,7 @@ export default defineComponent({
     const listEl = ref<HTMLElement | null>(null)
     const detectorEl = ref<HTMLElement | null>(null)
     const { tabItem, bindTabItem } = useTabItem()
+    const { t: pt } = injectLocaleProvider()
 
     let scroller: HTMLElement | Window
 
@@ -104,9 +106,10 @@ export default defineComponent({
     }
 
     return {
-      t,
       listEl,
       detectorEl,
+      pt,
+      t,
       isNumber,
       load,
       check,

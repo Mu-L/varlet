@@ -192,8 +192,7 @@ const value2 = ref(50)
 ### 值的校验
 
 通过 `rules` 属性对值进行校验。
-
-<span style="font-size: 12px"> `rules` 是一个可以接受 `function`、`boolean` 和 `string` 的数组。 函数传递输入值作为参数，必须返回 `true` / `false` 或包含错误消息的 `string`，如果函数返回 (或数组包含的任何值) `false` 或 `string`，输入字段将输入错误状态。</span>
+`rules` 是一个可以接受 `function`、`boolean` 和 `string` 的数组。 函数传递输入值作为参数，必须返回 `true` / `false` 或包含错误消息的 `string`，如果函数返回 (或数组包含的任何值) `false` 或 `string`，输入字段将输入错误状态。
 
 ```html
 <script setup>
@@ -203,7 +202,22 @@ const value = ref(20)
 </script>
 
 <template>
-  <var-slider v-model="value" :rules="[(v) => v > 35 || '错误信息']" />
+  <var-slider v-model="value" :rules="[v => v > 35 || '错误信息']" />
+</template>
+```
+
+### 使用 Zod 校验
+
+```html
+<script setup>
+import { ref } from 'vue'
+import { z } from 'zod'
+
+const value = ref(20)
+</script>
+
+<template>
+  <var-slider v-model="value" :rules="z.number().min(36, '错误信息')" />
 </template>
 ```
 
@@ -254,7 +268,7 @@ const value2 = ref([7, 64])
 | `disabled`         | 是否禁用                              | _boolean_ | `false`           |
 | `readonly`         | 是否只读                              | _boolean_ | `false`           |
 | `direction`        | 显示方向，可选值为 `vertical horizontal`        | _string_ | `horizontal` |
-| `rules`            | 校验规则                              | _Array<(v: number \| number[]) => any>_ | `-`               |
+| `rules` | 验证规则，返回 `true` 表示验证通过，其它类型的值将转换为文本作为用户提示。自 `3.5.0` 开始支持 [Zod 验证](#/zh-CN/zodValidation)  | _((v: number \| [number, number]) => any) \| ZodType \| Array<((v: number \| [number, number]) => any) \| ZodType>_ | `-` |
 
 ### 事件
 

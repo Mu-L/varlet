@@ -24,50 +24,54 @@
       v-bind="$attrs"
     >
       <div :class="n('title')">
-        <slot name="title">{{ title ?? t('dialogTitle') }}</slot>
+        <slot name="title">{{ title ?? (pt ? pt : t)('dialogTitle') }}</slot>
       </div>
       <div :class="n('message')" :style="{ textAlign: messageAlign }">
         <slot>
           {{ message }}
         </slot>
       </div>
-      <div :class="n('actions')">
-        <var-button
-          :class="classes(n('button'), n('cancel-button'))"
-          var-dialog-cover
-          text
-          :text-color="cancelButtonTextColor"
-          :color="cancelButtonColor"
-          v-if="cancelButton"
-          @click="cancel"
-        >
-          {{ cancelButtonText ?? t('dialogCancelButtonText') }}
-        </var-button>
-        <var-button
-          :class="classes(n('button'), n('confirm-button'))"
-          var-dialog-cover
-          text
-          :text-color="confirmButtonTextColor"
-          :color="confirmButtonColor"
-          v-if="confirmButton"
-          @click="confirm"
-        >
-          {{ confirmButtonText ?? t('dialogConfirmButtonText') }}
-        </var-button>
-      </div>
+
+      <slot name="actions" :slot-class="n('actions')" :cancel="cancel" :confirm="confirm">
+        <div :class="n('actions')">
+          <var-button
+            v-if="cancelButton"
+            :class="classes(n('button'), n('cancel-button'))"
+            var-dialog-cover
+            text
+            :text-color="cancelButtonTextColor"
+            :color="cancelButtonColor"
+            @click="cancel"
+          >
+            {{ cancelButtonText ?? (pt ? pt : t)('dialogCancelButtonText') }}
+          </var-button>
+          <var-button
+            v-if="confirmButton"
+            :class="classes(n('button'), n('confirm-button'))"
+            var-dialog-cover
+            text
+            :text-color="confirmButtonTextColor"
+            :color="confirmButtonColor"
+            @click="confirm"
+          >
+            {{ confirmButtonText ?? (pt ? pt : t)('dialogConfirmButtonText') }}
+          </var-button>
+        </div>
+      </slot>
     </div>
   </var-popup>
 </template>
 
 <script lang="ts">
-import VarPopup from '../popup'
-import VarButton from '../button'
-import { props } from './props'
 import { defineComponent, ref, watch } from 'vue'
+import { call } from '@varlet/shared'
+import VarButton from '../button'
 import { t } from '../locale'
+import { injectLocaleProvider } from '../locale-provider/provide'
+import VarPopup from '../popup'
 import { createNamespace } from '../utils/components'
 import { toSizeUnit } from '../utils/elements'
-import { call } from '@varlet/shared'
+import { props } from './props'
 
 const { name, n, classes } = createNamespace('dialog')
 
@@ -82,13 +86,14 @@ export default defineComponent({
   setup(props) {
     const popupShow = ref(false)
     const popupCloseOnClickOverlay = ref(false)
+    const { t: pt } = injectLocaleProvider()
 
     watch(
       () => props.show,
       (newValue) => {
         popupShow.value = newValue
       },
-      { immediate: true }
+      { immediate: true },
     )
 
     watch(
@@ -101,7 +106,7 @@ export default defineComponent({
 
         popupCloseOnClickOverlay.value = newValue
       },
-      { immediate: true }
+      { immediate: true },
     )
 
     function done() {
@@ -162,9 +167,10 @@ export default defineComponent({
     }
 
     return {
-      t,
       popupShow,
       popupCloseOnClickOverlay,
+      pt,
+      t,
       n,
       classes,
       handleClickOverlay,

@@ -1,9 +1,9 @@
-import Picker from '..'
-import VarPicker from '../Picker'
 import { createApp } from 'vue'
 import { mount } from '@vue/test-utils'
+import { expect, test, vi } from 'vitest'
+import Picker from '..'
 import { delay, mockTranslate, trigger } from '../../utils/test'
-import { expect, vi, test } from 'vitest'
+import VarPicker from '../Picker'
 
 mockTranslate()
 
@@ -144,7 +144,7 @@ test('test cascade mode', async () => {
         ],
       },
       { text: '新吴区' },
-    ]
+    ],
   )
 
   // find elements again for rebuild children
@@ -167,7 +167,7 @@ test('test cascade mode', async () => {
         ],
       },
       { text: '惠山区' },
-    ]
+    ],
   )
 
   wrapper.unmount()
@@ -228,13 +228,150 @@ test('test custom key', async () => {
         id: 10,
         label: '新吴区',
       },
-    ]
+    ],
   )
 
   wrapper.unmount()
 })
 
-test('test column option className', async () => {
+test('test multiple column picker columnsCount', async () => {
+  const onConfirm = vi.fn()
+  const wrapper = mount(VarPicker, {
+    props: {
+      columns: [
+        [
+          { text: 'A', value: '1-1' },
+          { text: 'B', value: '1-2' },
+          { text: 'C', value: '1-3' },
+        ],
+        [
+          { text: 'A', value: '2-1' },
+          { text: 'B', value: '2-2' },
+          { text: 'C', value: '2-3' },
+        ],
+        [
+          { text: 'A', value: '3-1' },
+          { text: 'B', value: '3-2' },
+          { text: 'C', value: '3-3' },
+        ],
+      ],
+      columnsCount: 2,
+      onConfirm,
+    },
+  })
+  const columns = wrapper.findAll('.var-picker__column')
+  expect(wrapper.html()).toMatchSnapshot()
+  expect(columns.length).toBe(2)
+
+  await triggerDrag(columns[1].element, 0, -44)
+  await wrapper.find('.var-picker__confirm-button').trigger('click')
+  expect(onConfirm).lastCalledWith(
+    ['1-1', '2-2'],
+    [0, 1],
+    [
+      {
+        text: 'A',
+        value: '1-1',
+      },
+      {
+        text: 'B',
+        value: '2-2',
+      },
+    ],
+  )
+  wrapper.unmount()
+})
+
+test('test cascade column picker columnsCount', async () => {
+  const onConfirm = vi.fn()
+  const wrapper = mount(VarPicker, {
+    props: {
+      columns: [
+        {
+          text: '四川省',
+          children: [
+            {
+              text: '成都市',
+              children: [
+                {
+                  text: '温江区',
+                },
+              ],
+            },
+            {
+              text: '攀枝花市',
+              children: [
+                {
+                  text: '东区',
+                },
+              ],
+            },
+          ],
+        },
+        {
+          text: '江苏省',
+          children: [
+            {
+              text: '无锡市',
+              children: [
+                {
+                  text: '新吴区',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      cascade: true,
+      columnsCount: 2,
+      onConfirm,
+    },
+  })
+  const columns = wrapper.findAll('.var-picker__column')
+  expect(wrapper.html()).toMatchSnapshot()
+  expect(columns.length).toBe(2)
+
+  await triggerDrag(columns[1].element, 0, -44)
+  await wrapper.find('.var-picker__confirm-button').trigger('click')
+  expect(onConfirm).lastCalledWith(
+    ['四川省', '攀枝花市'],
+    [0, 1],
+    [
+      {
+        text: '四川省',
+        children: [
+          {
+            text: '成都市',
+            children: [
+              {
+                text: '温江区',
+              },
+            ],
+          },
+          {
+            text: '攀枝花市',
+            children: [
+              {
+                text: '东区',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        text: '攀枝花市',
+        children: [
+          {
+            text: '东区',
+          },
+        ],
+      },
+    ],
+  )
+  wrapper.unmount()
+})
+
+test('test column option className', () => {
   const wrapper = mount(VarPicker, {
     props: {
       columns: [

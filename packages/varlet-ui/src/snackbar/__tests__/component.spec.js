@@ -1,9 +1,9 @@
-import Snackbar from '..'
-import VarSnackbar from '../Snackbar'
-import { mount } from '@vue/test-utils'
 import { createApp } from 'vue'
+import { mount } from '@vue/test-utils'
+import { expect, test, vi } from 'vitest'
+import Snackbar from '..'
 import { delay, mockStubs } from '../../utils/test'
-import { expect, vi, test } from 'vitest'
+import VarSnackbar from '../Snackbar'
 
 test('test snackbar component plugin', () => {
   const app = createApp({}).use(Snackbar.Component)
@@ -18,6 +18,7 @@ test('test snackbar style', async () => {
       position="center"
       content-class="test-snackbar"
       vertical
+      :elevation="5"
       :duration="500"
       loading-type="wave"
       loading-size="large"

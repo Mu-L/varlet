@@ -1,9 +1,10 @@
-import Uploader from '..'
-import VarUploader from '../Uploader'
-import { mount } from '@vue/test-utils'
 import { createApp } from 'vue'
+import { mount } from '@vue/test-utils'
+import { expect, test, vi } from 'vitest'
+import { z } from 'zod'
+import Uploader from '..'
 import { delay, mockFileReader, mockStubs, triggerKeyboard } from '../../utils/test'
-import { expect, vi, test } from 'vitest'
+import VarUploader from '../Uploader'
 
 const createEvent = (filename, type) => ({
   target: {
@@ -51,7 +52,7 @@ test('test uploader onBeforeFilter', async () => {
     modelValue: [],
     multiple: true,
     'onUpdate:modelValue': onUpdateModelValue,
-    async onBeforeFilter(files) {
+    onBeforeFilter(files) {
       return new Promise((resolve) => {
         setTimeout(() => {
           resolve(files.filter((file) => file.name.endsWith('jpg')))
@@ -100,8 +101,8 @@ test('test uploader preview', async () => {
     props: {
       modelValue: [
         {
-          url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-          cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+          url: 'https://varletjs.org/varlet/cat.jpg',
+          cover: 'https://varletjs.org/varlet/cat.jpg',
         },
       ],
       'onUpdate:modelValue': onUpdateModelValue,
@@ -127,8 +128,8 @@ test('test uploader preview event', async () => {
     props: {
       modelValue: [
         {
-          url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-          cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+          url: 'https://varletjs.org/varlet/cat.jpg',
+          cover: 'https://varletjs.org/varlet/cat.jpg',
         },
       ],
       onPreview,
@@ -151,8 +152,8 @@ test('test uploader prevent default preview', async () => {
     props: {
       modelValue: [
         {
-          url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-          cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+          url: 'https://varletjs.org/varlet/cat.jpg',
+          cover: 'https://varletjs.org/varlet/cat.jpg',
         },
       ],
       preventDefaultPreview: true,
@@ -246,7 +247,7 @@ test('test uploader validation', async () => {
   const wrapper = mount(VarUploader, {
     props: {
       modelValue: [],
-      rules: [(v) => v.length >= 1 || '您至少上传一个'],
+      rules: [(v) => v.length >= 1 || 'You must upload one file at least'],
       'onUpdate:modelValue': onUpdateModelValue,
     },
   })
@@ -254,7 +255,7 @@ test('test uploader validation', async () => {
   wrapper.vm.validate()
   await delay(16)
   expect(wrapper.html()).toMatchSnapshot()
-  expect(wrapper.find('.var-form-details__error-message').text()).toBe('您至少上传一个')
+  expect(wrapper.find('.var-form-details__error-message').text()).toBe('You must upload one file at least')
 
   await wrapper.vm.handleChange(createEvent('cat.png', 'image/png'))
   await delay(16)
@@ -355,7 +356,7 @@ test('test uploader hideList', async () => {
   mockRestore()
 })
 
-test('test uploader file utils', async () => {
+test('test uploader file utils', () => {
   const modelValue = [
     {
       id: 1,
@@ -409,12 +410,12 @@ test('test uploader progress', () => {
 test('test uploader extra slot', async () => {
   const wrapper = mount(VarUploader, {
     slots: {
-      'extra-message': () => '还能上传3个文件',
+      'extra-message': () => 'There are three files rest to upload',
     },
   })
 
   await delay(100)
-  expect(wrapper.find('.var-form-details__extra-message').text()).toBe('还能上传3个文件')
+  expect(wrapper.find('.var-form-details__extra-message').text()).toBe('There are three files rest to upload')
 
   wrapper.unmount()
 })
@@ -611,5 +612,59 @@ test('test uploader keyboard space for chooseFile', async () => {
   expect(click).toHaveBeenCalledTimes(1)
 
   HTMLInputElement.prototype.click = origin
+  wrapper.unmount()
+})
+
+test('test uploader validation with zod', async () => {
+  const { mockRestore } = mockFileReader('data:image/png;base64,')
+  const onUpdateModelValue = vi.fn((value) => wrapper.setProps({ modelValue: value }))
+
+  const wrapper = mount(VarUploader, {
+    props: {
+      modelValue: [],
+      rules: z.array(z.any()).min(1, 'You must upload one file at least'),
+      'onUpdate:modelValue': onUpdateModelValue,
+    },
+  })
+
+  wrapper.vm.validate()
+  await delay(16)
+  expect(wrapper.html()).toMatchSnapshot()
+  expect(wrapper.find('.var-form-details__error-message').text()).toBe('You must upload one file at least')
+
+  await wrapper.vm.handleChange(createEvent('cat.png', 'image/png'))
+  await delay(16)
+  expect(onUpdateModelValue).toHaveBeenCalledTimes(1)
+  expect(wrapper.html()).toMatchSnapshot()
+  expect(wrapper.find('.var-form-details__error-message').exists()).toBeFalsy()
+
+  wrapper.vm.reset()
+  await delay(16)
+  expect(wrapper.vm.modelValue).toStrictEqual([])
+
+  wrapper.unmount()
+  mockRestore()
+})
+
+test('test uploader remove button slot', () => {
+  const { mockRestore: mockRestoreStubs } = mockStubs()
+
+  const wrapper = mount(VarUploader, {
+    props: {
+      modelValue: [
+        {
+          url: 'https://varletjs.org/varlet/cat.jpg',
+          cover: 'https://varletjs.org/varlet/cat.jpg',
+        },
+      ],
+    },
+    slots: {
+      'remove-button': () => 'remove',
+    },
+  })
+
+  expect(wrapper.html()).toMatchSnapshot()
+
+  mockRestoreStubs()
   wrapper.unmount()
 })

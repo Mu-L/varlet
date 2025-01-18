@@ -25,7 +25,7 @@
     var-picker-cover
   >
     <div :class="n()" v-bind="$attrs">
-      <div :class="n('toolbar')" v-if="toolbar">
+      <div v-if="toolbar" :class="n('toolbar')">
         <slot name="cancel">
           <var-button
             :class="n('cancel-button')"
@@ -34,11 +34,11 @@
             :text-color="cancelButtonTextColor"
             @click="cancel"
           >
-            {{ cancelButtonText ?? t('pickerCancelButtonText') }}
+            {{ cancelButtonText ?? (pt ? pt : t)('pickerCancelButtonText') }}
           </var-button>
         </slot>
         <slot name="title">
-          <div :class="n('title')">{{ title ?? t('pickerTitle') }}</div>
+          <div :class="n('title')">{{ title ?? (pt ? pt : t)('pickerTitle') }}</div>
         </slot>
         <slot name="confirm">
           <var-button
@@ -48,22 +48,22 @@
             :text-color="confirmButtonTextColor"
             @click="confirm"
           >
-            {{ confirmButtonText ?? t('pickerConfirmButtonText') }}
+            {{ confirmButtonText ?? (pt ? pt : t)('pickerConfirmButtonText') }}
           </var-button>
         </slot>
       </div>
       <div :class="n('columns')" :style="{ height: `${columnHeight}px` }">
         <div
-          :class="n('column')"
           v-for="c in scrollColumns"
           :key="c.id"
+          :class="n('column')"
           @touchstart.passive="handleTouchstart($event, c)"
           @touchmove.prevent="handleTouchmove($event, c)"
           @touchend="handleTouchend(c)"
         >
           <div
-            :class="n('scroller')"
             :ref="(el) => setScrollEl(el, c)"
+            :class="n('scroller')"
             :style="{
               transform: `translateY(${c.translate}px)`,
               transitionDuration: `${c.duration}ms`,
@@ -96,15 +96,16 @@
 </template>
 
 <script lang="ts">
-import VarButton from '../button'
-import VarPopup from '../popup'
-import { defineComponent, watch, ref, computed, Transition, type ComponentPublicInstance } from 'vue'
-import { props, type PickerColumnOption } from './props'
+import { computed, defineComponent, ref, Transition, watch, type ComponentPublicInstance } from 'vue'
+import { call, clamp, clampArrayRange, toNumber } from '@varlet/shared'
 import { useTouch, useVModel } from '@varlet/use'
-import { clamp, clampArrayRange, call } from '@varlet/shared'
-import { toPxNum, getTranslateY } from '../utils/elements'
+import VarButton from '../button'
 import { t } from '../locale'
+import { injectLocaleProvider } from '../locale-provider/provide'
+import VarPopup from '../popup'
 import { createNamespace } from '../utils/components'
+import { getTranslateY, toPxNum } from '../utils/elements'
+import { props, type PickerColumnOption } from './props'
 
 export interface ScrollColumn {
   id: number
@@ -139,11 +140,13 @@ export default defineComponent({
   setup(props) {
     const modelValue = useVModel(props, 'modelValue')
     const scrollColumns = ref<ScrollColumn[]>([])
+    const visibleColumnsCount = computed(() => toNumber(props.columnsCount))
     const optionHeight = computed(() => toPxNum(props.optionHeight))
     const optionCount = computed(() => toPxNum(props.optionCount))
     const center = computed(() => (optionCount.value * optionHeight.value) / 2 - optionHeight.value / 2)
     const columnHeight = computed(() => optionCount.value * optionHeight.value)
     const { prevY, moveY, dragging, startTouch, moveTouch, endTouch } = useTouch()
+    const { t: pt } = injectLocaleProvider()
 
     let prevIndexes: number[] = []
 
@@ -172,7 +175,8 @@ export default defineComponent({
     }
 
     function normalizeNormalMode(columns: PickerColumnOption[][]) {
-      return columns.map((column, idx) => {
+      const visibleColumns = props.columnsCount != null ? columns.slice(0, visibleColumnsCount.value) : columns
+      return visibleColumns.map((column, idx) => {
         const scrollColumn: ScrollColumn = {
           id: sid++,
           prevY: 0,
@@ -202,8 +206,13 @@ export default defineComponent({
       return scrollColumns
     }
 
-    function createChildren(scrollColumns: ScrollColumn[], children: PickerColumnOption[], syncModelValue = true) {
-      if (children.length) {
+    function createChildren(
+      scrollColumns: ScrollColumn[],
+      children: PickerColumnOption[],
+      syncModelValue = true,
+      depth = 1,
+    ) {
+      if (children.length && (props.columnsCount == null || depth <= visibleColumnsCount.value)) {
         const scrollColumn: ScrollColumn = {
           id: sid++,
           prevY: 0,
@@ -230,7 +239,8 @@ export default defineComponent({
         createChildren(
           scrollColumns,
           scrollColumn.column[scrollColumn.index][getOptionKey('children')] ?? [],
-          syncModelValue
+          syncModelValue,
+          depth + 1,
         )
       }
     }
@@ -240,7 +250,8 @@ export default defineComponent({
       createChildren(
         scrollColumns.value,
         scrollColumn.column[scrollColumn.index][getOptionKey('children')] ?? [],
-        false
+        false,
+        scrollColumns.value.length + 1,
       )
     }
 
@@ -436,13 +447,14 @@ export default defineComponent({
     }
 
     return {
-      t,
       optionHeight,
       optionCount,
       scrollColumns,
       columnHeight,
       center,
       Transition,
+      pt,
+      t,
       n,
       classes,
       setScrollEl,

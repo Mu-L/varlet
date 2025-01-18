@@ -1,5 +1,5 @@
-import { VarComponent, ListenerProp, SetPropsDefaults } from './varComponent'
-import { VNode, App } from 'vue'
+import { App, VNode } from 'vue'
+import { ListenerProp, SetPropsDefaults, VarComponent } from './varComponent'
 
 export declare const pickerProps: Record<keyof PickerProps, any>
 
@@ -24,6 +24,7 @@ export interface PickerProps {
   cascade?: boolean
   optionHeight?: string | number
   optionCount?: string | number
+  columnsCount?: string | number
   confirmButtonText?: string
   cancelButtonText?: string
   confirmButtonTextColor?: string
@@ -70,6 +71,7 @@ export interface PickerOptions {
   cascade?: boolean
   optionHeight?: number | string
   optionCount?: number | string
+  columnsCount?: number | string
   confirmButtonText?: string
   cancelButtonText?: string
   confirmButtonTextColor?: string
@@ -99,6 +101,6 @@ export interface IPicker {
   close(): void
 }
 
-export const Picker: IPicker
+export declare const Picker: IPicker
 
 export class _PickerComponent extends PickerComponent {}

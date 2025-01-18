@@ -1,4 +1,4 @@
-import { type PropType, ImgHTMLAttributes } from 'vue'
+import { ImgHTMLAttributes, type PropType } from 'vue'
 import { defineListenerProp } from '../utils/components'
 
 export type ImageFit = 'fill' | 'contain' | 'cover' | 'none' | 'scale-down'
@@ -8,6 +8,10 @@ export const props = {
   fit: {
     type: String as PropType<ImageFit>,
     default: 'fill',
+  },
+  position: {
+    type: String,
+    default: '50% 50%',
   },
   alt: String,
   title: String,

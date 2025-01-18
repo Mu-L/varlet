@@ -1,7 +1,7 @@
 <script setup>
-import { t, use } from './locale'
-import { AppType, watchLang, onThemeChange } from '@varlet/cli/client'
 import { ref } from 'vue'
+import { AppType, onThemeChange, watchLang } from '@varlet/cli/client'
+import { t, use } from './locale'
 
 const active = ref(0)
 
@@ -52,7 +52,7 @@ onThemeChange()
   <app-type>{{ t('custom') }}</app-type>
   <var-app-bar
     round
-    image="https://varlet.gitee.io/varlet-ui/tree.jpeg"
+    image="tree.jpeg"
     image-linear-gradient="to right top, rgba(29, 68, 147, 0.5) 0%, rgba(74, 198, 170, 0.9) 100%"
   >
     {{ t('title') }}
@@ -76,11 +76,11 @@ onThemeChange()
 
     <template #content>
       <var-tabs
+        v-model:active="active"
         style="margin-top: 20vmin"
         color="transparent"
         active-color="#fff"
         inactive-color="#ddd"
-        v-model:active="active"
       >
         <var-tab>{{ t('option') }}</var-tab>
         <var-tab>{{ t('option') }}</var-tab>

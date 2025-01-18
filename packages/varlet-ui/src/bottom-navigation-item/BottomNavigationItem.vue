@@ -1,16 +1,37 @@
 <template>
   <button
-    :class="classes(n(), n('$--box'), [isActive, n('--active')])"
     v-ripple
+    :class="classes(n(), n('$--box'), [variant, n('--variant-padding')], [isActive && !variant, n('--active')])"
     :style="{
       color: isActive ? activeColor : inactiveColor,
     }"
     @click="handleClick"
   >
-    <slot name="icon" :active="isActive">
-      <var-icon v-if="icon" :name="icon" :namespace="namespace" :class="n('icon')" var-bottom-navigation-item-cover />
-    </slot>
-    <var-badge v-if="badge" v-bind="badgeProps" :class="n('badge')" var-bottom-navigation-item-cover />
+    <div
+      :class="
+        classes(
+          n('icon-container'),
+          [variant, n('--variant-icon-container')],
+          [isActive && variant, n('--variant-active')],
+        )
+      "
+    >
+      <var-badge v-if="badge" v-bind="badgeProps" :class="n('badge')" var-bottom-navigation-item-cover>
+        <slot name="icon" :active="isActive">
+          <var-icon
+            v-if="icon"
+            :name="icon"
+            :namespace="namespace"
+            :class="n('icon')"
+            var-bottom-navigation-item-cover
+          />
+        </slot>
+      </var-badge>
+      <slot v-else name="icon" :active="isActive">
+        <var-icon v-if="icon" :name="icon" :namespace="namespace" :class="n('icon')" var-bottom-navigation-item-cover />
+      </slot>
+    </div>
+
     <span :class="n('label')">
       <slot>{{ label }}</slot>
     </span>
@@ -18,15 +39,15 @@
 </template>
 
 <script lang="ts">
-import Ripple from '../ripple'
+import { computed, defineComponent } from 'vue'
+import { call } from '@varlet/shared'
+import { type BadgeProps } from '../../types'
 import VarBadge from '../badge'
 import VarIcon from '../icon'
-import { defineComponent, computed } from 'vue'
+import Ripple from '../ripple'
+import { createNamespace } from '../utils/components'
 import { props } from './props'
 import { useBottomNavigation, type BottomNavigationItemProvider } from './provide'
-import { createNamespace } from '../utils/components'
-import { type BadgeProps } from '../../types'
-import { call } from '@varlet/shared'
 
 const { name, n, classes } = createNamespace('bottom-navigation-item')
 
@@ -48,7 +69,7 @@ export default defineComponent({
     const isActive = computed<boolean>(() => [name.value, index.value].includes(active.value))
     const badgeProps = computed(() => (props.badge === true ? defaultBadgeProps : props.badge) as BadgeProps)
     const { index, bottomNavigation, bindBottomNavigation } = useBottomNavigation()
-    const { active, activeColor, inactiveColor } = bottomNavigation
+    const { active, activeColor, inactiveColor, variant } = bottomNavigation
     const bottomNavigationItemProvider: BottomNavigationItemProvider = {
       name,
       index,
@@ -68,6 +89,7 @@ export default defineComponent({
       inactiveColor,
       badgeProps,
       isActive,
+      variant,
       n,
       classes,
       handleClick,

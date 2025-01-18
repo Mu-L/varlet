@@ -1,35 +1,36 @@
 <script setup>
-import { Snackbar, Dialog } from '@varlet/ui'
-import { AppType, watchLang, onThemeChange } from '@varlet/cli/client'
-import { reactive, onUnmounted } from 'vue'
-import { use, t } from './locale'
+import { onUnmounted, reactive } from 'vue'
+import { AppType, onThemeChange, watchLang } from '@varlet/cli/client'
+import { Dialog, Snackbar } from '@varlet/ui'
+import { z } from 'zod'
+import { t, use } from './locale'
 
 const values = reactive({
   files: [],
   files2: [
     {
-      url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-      cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+      url: 'cat.jpg',
+      cover: 'cat.jpg',
     },
     {
       url: 'https://www.runoob.com/try/demo_source/mov_bbb.mp4',
-      cover: 'https://varlet.gitee.io/varlet-ui/cover.jpg',
+      cover: 'cover.jpg',
     },
   ],
   files3: [
     {
-      url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-      cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+      url: 'cat.jpg',
+      cover: 'cat.jpg',
       state: 'loading',
     },
     {
-      url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-      cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+      url: 'cat.jpg',
+      cover: 'cat.jpg',
       state: 'success',
     },
     {
-      url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-      cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+      url: 'cat.jpg',
+      cover: 'cat.jpg',
       state: 'error',
     },
   ],
@@ -41,37 +42,38 @@ const values = reactive({
   files9: [],
   files10: [
     {
-      url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-      cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+      url: 'cat.jpg',
+      cover: 'cat.jpg',
       state: 'error',
     },
   ],
   files11: [
     {
-      url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-      cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+      url: 'cat.jpg',
+      cover: 'cat.jpg',
     },
   ],
   files12: [
     {
-      url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-      cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+      url: 'cat.jpg',
+      cover: 'cat.jpg',
       state: 'loading',
     },
     {
-      url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-      cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+      url: 'cat.jpg',
+      cover: 'cat.jpg',
       state: 'success',
     },
     {
-      url: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
-      cover: 'https://varlet.gitee.io/varlet-ui/cat.jpg',
+      url: 'cat.jpg',
+      cover: 'cat.jpg',
       state: 'error',
     },
   ],
   files13: [],
   files14: [],
   files15: [],
+  files16: [],
 })
 
 let timer
@@ -184,10 +186,10 @@ function handleActionClick(chooseFile) {
   <var-uploader v-model="values.files15" @click-action="handleActionClick" />
 
   <app-type>{{ t('disabled') }}</app-type>
-  <var-uploader disabled v-model="values.files8" />
+  <var-uploader v-model="values.files8" disabled />
 
   <app-type>{{ t('readonly') }}</app-type>
-  <var-uploader readonly v-model="values.files9" />
+  <var-uploader v-model="values.files9" readonly />
 
   <app-type>{{ t('beforeRemove') }}</app-type>
   <var-uploader v-model="values.files11" @before-remove="handleBeforeRemove" />
@@ -198,19 +200,34 @@ function handleActionClick(chooseFile) {
   </var-uploader>
 
   <app-type>{{ t('validate') }}</app-type>
-  <var-uploader :rules="[(v, u) => u.getError().length === 0 || t('validateMessage')]" v-model="values.files10" />
+  <var-uploader v-model="values.files10" :rules="[(v, u) => u.getError().length === 0 || t('validateMessage')]" />
+
+  <app-type>{{ t('validateWithZod') }}</app-type>
+  <var-uploader
+    v-model="values.files16"
+    :rules="
+      z.array(z.any()).refine((v) => v.filter((file) => file.state === 'error').length === 0, t('validateMessage'))
+    "
+  />
 
   <app-type>{{ t('customRender') }}</app-type>
   <var-space>
-    <img class="custom-uploader-file" v-for="f in values.files12" :key="f.id" :src="f.cover" />
-    <var-uploader hide-list v-model="values.files12">
+    <img v-for="f in values.files12" :key="f.id" class="custom-uploader-file" :src="f.cover" />
+    <var-uploader v-model="values.files12" hide-list>
       <var-button round type="primary">
         <var-icon :size="28" name="upload" />
       </var-button>
     </var-uploader>
   </var-space>
 
-  <var-space></var-space>
+  <app-type>{{ t('removeButtonSlot') }}</app-type>
+  <var-uploader v-model="values.files2">
+    <template #remove-button="{ remove }">
+      <div class="custom-remove-button">
+        <var-icon color="#fff" name="window-close" @click.stop="remove"></var-icon>
+      </div>
+    </template>
+  </var-uploader>
 </template>
 
 <style scoped lang="less">
@@ -224,5 +241,12 @@ function handleActionClick(chooseFile) {
   border-radius: 50%;
   font-size: 12px;
   object-fit: cover;
+}
+
+.custom-remove-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 3;
 }
 </style>

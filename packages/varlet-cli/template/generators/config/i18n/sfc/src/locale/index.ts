@@ -11,6 +11,12 @@ export type Message = {
   [key: PropertyKey]: any
 }
 
+type ValueOf<T> = T[keyof T]
+
+const { hasOwnProperty } = Object.prototype
+
+const hasOwn = <T extends object>(val: T, key: PropertyKey): key is keyof T => hasOwnProperty.call(val, key)
+
 function useLocale<T = Message>() {
   const messages: Record<string, Partial<T>> = {}
   const currentMessage: Ref<Partial<T>> = ref({})
@@ -40,12 +46,10 @@ function useLocale<T = Message>() {
     use(lang)
   }
 
-  const t = (id: string) => {
-    if (Object.prototype.hasOwnProperty.call(currentMessage.value, id)) {
+  const t = (id: string): ValueOf<T> | undefined => {
+    if (hasOwn(currentMessage.value, id)) {
       return currentMessage.value[id]
     }
-
-    return id
   }
 
   return {
@@ -54,18 +58,18 @@ function useLocale<T = Message>() {
     add,
     use,
     merge,
-    t
+    t,
   }
 }
 
-const { messages, currentMessage, add, use, merge } = useLocale()
+const { messages, currentMessage, add, use, merge, t } = useLocale()
 
 add('zh-CN', zhCN)
 use('zh-CN')
 
-export { messages, currentMessage, add, use, merge, useLocale }
+export { messages, currentMessage, add, use, merge, t, useLocale }
 
-export const _LocaleComponent = { messages, currentMessage, add, use, merge, useLocale }
+export const _LocaleComponent = { messages, currentMessage, add, use, merge, t, useLocale }
 
 export default {
   messages,
@@ -73,5 +77,6 @@ export default {
   add,
   use,
   merge,
+  t,
   useLocale,
 }

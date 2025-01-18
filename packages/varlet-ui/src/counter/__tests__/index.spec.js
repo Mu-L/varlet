@@ -1,9 +1,10 @@
-import Counter from '..'
-import VarCounter from '../Counter'
-import { mount } from '@vue/test-utils'
 import { createApp } from 'vue'
+import { mount } from '@vue/test-utils'
+import { expect, test, vi } from 'vitest'
+import { z } from 'zod'
+import Counter from '..'
 import { delay, trigger } from '../../utils/test'
-import { expect, vi, test } from 'vitest'
+import VarCounter from '../Counter'
 
 test('test counter plugin', () => {
   const app = createApp({}).use(Counter)
@@ -31,7 +32,7 @@ test('test counter increment & decrement', async () => {
   wrapper.unmount()
 })
 
-test('test counter initial value over max', async () => {
+test('test counter initial value over max', () => {
   const wrapper = mount({
     ...Wrapper,
     data: () => ({
@@ -45,7 +46,7 @@ test('test counter initial value over max', async () => {
   wrapper.unmount()
 })
 
-test('test counter initial value less min', async () => {
+test('test counter initial value less min', () => {
   const wrapper = mount({
     ...Wrapper,
     data: () => ({
@@ -147,7 +148,7 @@ test('test counter readonly', async () => {
 test('test counter validation', async () => {
   const wrapper = mount({
     ...Wrapper,
-    template: `<var-counter ref="counter" :rules="[v => v > 0 || '必须大于0']" v-model="value" />`,
+    template: `<var-counter ref="counter" :rules="[v => v > 0 || 'The value must be more than zero']" v-model="value" />`,
   })
 
   const { counter } = wrapper.vm.$refs
@@ -156,7 +157,7 @@ test('test counter validation', async () => {
   await delay(16)
 
   expect(wrapper.html()).toMatchSnapshot()
-  expect(wrapper.find('.var-form-details__error-message').text()).toBe('必须大于0')
+  expect(wrapper.find('.var-form-details__error-message').text()).toBe('The value must be more than zero')
 
   await wrapper.find('.var-counter__increment-button').trigger('click')
   await delay(16)
@@ -435,6 +436,34 @@ test('test counter onIncrement & onDecrement', async () => {
   await delay(100)
   await wrapper.find('.var-counter__decrement-button').trigger('click')
   expect(onDecrement).toBeCalledTimes(2)
+
+  wrapper.unmount()
+})
+test('test counter validation with zod', async () => {
+  const wrapper = mount({
+    ...Wrapper,
+    data: () => ({
+      value: 0,
+      rules: z.number().min(1, 'The value must be more than zero'),
+    }),
+    template: `<var-counter ref="counter" :rules="[v => v > 0 || 'The value must be more than zero']" v-model="value" />`,
+  })
+
+  const { counter } = wrapper.vm.$refs
+
+  counter.validate()
+  await delay(16)
+
+  expect(wrapper.html()).toMatchSnapshot()
+  expect(wrapper.find('.var-form-details__error-message').text()).toBe('The value must be more than zero')
+
+  await wrapper.find('.var-counter__increment-button').trigger('click')
+  await delay(16)
+  expect(wrapper.find('.var-form-details__error-message').exists()).toBeFalsy()
+
+  counter.reset()
+  await delay(16)
+  expect(wrapper.vm.value).toBe(0)
 
   wrapper.unmount()
 })

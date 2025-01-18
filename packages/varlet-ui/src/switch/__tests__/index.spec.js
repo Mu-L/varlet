@@ -1,9 +1,10 @@
-import Switch from '..'
-import VarSwitch from '../Switch'
-import { mount } from '@vue/test-utils'
 import { createApp } from 'vue'
+import { mount } from '@vue/test-utils'
+import { describe, expect, test, vi } from 'vitest'
+import { z } from 'zod'
+import Switch from '..'
 import { delay, triggerKeyboard } from '../../utils/test'
-import { expect, vi, test, describe } from 'vitest'
+import VarSwitch from '../Switch'
 
 test('test switch plugin', () => {
   const app = createApp({}).use(Switch)
@@ -55,6 +56,19 @@ describe('test switch component props', () => {
     wrapper.unmount()
   })
 
+  test('test switch buttonElevation', async () => {
+    const wrapper = mount(VarSwitch)
+
+    expect(wrapper.find('.var-elevation--2').exists()).toBeTruthy()
+
+    await wrapper.setProps({
+      buttonElevation: 4,
+    })
+
+    expect(wrapper.find('.var-elevation--4').exists()).toBeTruthy()
+    wrapper.unmount()
+  })
+
   test('test switch loading', () => {
     const wrapper = mount(VarSwitch, {
       props: {
@@ -96,6 +110,26 @@ describe('test switch component props', () => {
     })
 
     expect(wrapper.find('.var-switch__handle').attributes('style')).toContain('width: 25px; height: 25px;')
+    wrapper.unmount()
+  })
+
+  test('test variant mode', async () => {
+    const wrapper = mount({
+      components: {
+        [VarSwitch.name]: VarSwitch,
+      },
+      data() {
+        return {
+          value: true,
+          variant: false,
+        }
+      },
+      template: `<var-switch :variant="variant" v-model="value" />`,
+    })
+
+    expect(wrapper.html()).toMatchSnapshot()
+    await wrapper.setData({ variant: true })
+    expect(wrapper.html()).toMatchSnapshot()
     wrapper.unmount()
   })
 })
@@ -242,4 +276,24 @@ describe('test switch events', () => {
     HTMLElement.prototype.click = origin
     wrapper.unmount()
   })
+})
+
+test('test switch valiation with zod', async () => {
+  const wrapper = mount({
+    components: {
+      [VarSwitch.name]: VarSwitch,
+    },
+    data: () => ({
+      modelValue: true,
+      rules: z.boolean().refine((v) => v, 'value must be true'),
+    }),
+    template: `<var-switch v-model="modelValue" :rules="rules" />`,
+  })
+
+  await wrapper.setData({
+    modelValue: false,
+  })
+  await wrapper.find('.var-switch__block').trigger('click')
+  await delay(16)
+  expect(wrapper.html()).toMatchSnapshot()
 })

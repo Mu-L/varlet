@@ -7,10 +7,7 @@ export default defineConfig({
   },
   pc: {
     header: {
-      playground:
-        process.env.NODE_ENV === 'development'
-          ? 'http://localhost:3000'
-          : 'https://varlet.gitee.io/varlet-ui-playground',
+      playground: process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://varletjs.org/playground',
     },
     menu: [
       {
@@ -54,14 +51,6 @@ export default defineConfig({
       },
       {
         text: {
-          'zh-CN': 'VSCode 插件',
-          'en-US': 'VSCode Extension',
-        },
-        doc: 'extension',
-        type: 3,
-      },
-      {
-        text: {
           'zh-CN': '主题系统',
           'en-US': 'Theme System',
         },
@@ -78,18 +67,42 @@ export default defineConfig({
       },
       {
         text: {
-          'zh-CN': '默认值定制',
-          'en-US': 'Defaults Customization',
-        },
-        doc: 'defaultsCustomization',
-        type: 3,
-      },
-      {
-        text: {
           'zh-CN': '服务端渲染',
           'en-US': 'Server-Side Rendering',
         },
         doc: 'serverSideRendering',
+        type: 3,
+      },
+      {
+        text: {
+          'zh-CN': 'Zod 验证',
+          'en-US': 'Zod Validation',
+        },
+        doc: 'zodValidation',
+        type: 3,
+      },
+      {
+        text: {
+          'zh-CN': '原子化 CSS 支持',
+          'en-US': 'Atomic CSS Support',
+        },
+        doc: 'atomicCssSupport',
+        type: 3,
+      },
+      {
+        text: {
+          'zh-CN': 'VSCode 插件',
+          'en-US': 'VSCode Extension',
+        },
+        doc: 'extension',
+        type: 3,
+      },
+      {
+        text: {
+          'zh-CN': '默认值定制',
+          'en-US': 'Defaults Customization',
+        },
+        doc: 'defaultsCustomization',
         type: 3,
       },
       {
@@ -250,6 +263,7 @@ export default defineConfig({
         },
         type: 1,
       },
+
       {
         text: {
           'zh-CN': 'Skeleton 骨架屏',
@@ -380,6 +394,14 @@ export default defineConfig({
       },
       {
         text: {
+          'zh-CN': 'Code 代码块',
+          'en-US': 'Code',
+        },
+        doc: 'code',
+        type: 2,
+      },
+      {
+        text: {
           'zh-CN': '导航组件',
           'en-US': 'Navigation Components',
         },
@@ -454,6 +476,14 @@ export default defineConfig({
           'en-US': 'Action Components',
         },
         type: 1,
+      },
+      {
+        text: {
+          'zh-CN': 'Alert 警告信息',
+          'en-US': 'Alert',
+        },
+        doc: 'alert',
+        type: 2,
       },
       {
         text: {
@@ -569,6 +599,14 @@ export default defineConfig({
       },
       {
         text: {
+          'zh-CN': 'CountTo 数字动画',
+          'en-US': 'CountTo',
+        },
+        doc: 'count-to',
+        type: 2,
+      },
+      {
+        text: {
           'zh-CN': 'Countdown 倒计时',
           'en-US': 'Countdown',
         },
@@ -620,6 +658,14 @@ export default defineConfig({
           'en-US': 'Input',
         },
         doc: 'input',
+        type: 2,
+      },
+      {
+        text: {
+          'zh-CN': 'AutoComplete 自动补全',
+          'en-US': 'AutoComplete',
+        },
+        doc: 'auto-complete',
         type: 2,
       },
       {
@@ -687,9 +733,6 @@ export default defineConfig({
         type: 2,
       },
     ],
-  },
-  highlight: {
-    style: null,
   },
   copy: [{ from: '../varlet-icons/dist/png', to: './public/icons/png', type: 'folder' }],
   directives: ['ripple', 'lazy', 'hover'],

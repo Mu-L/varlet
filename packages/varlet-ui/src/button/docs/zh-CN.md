@@ -108,19 +108,19 @@
 ```html
 <template>
   <var-space :size="[10, 10]">
-    <var-button type="primary" round>
+    <var-button type="primary" round icon-container>
       <var-icon name="plus" />
     </var-button>
-    <var-button type="info" round>
+    <var-button type="info" round icon-container>
       <var-icon name="information" />
     </var-button>
-    <var-button type="success" round>
+    <var-button type="success" round icon-container>
       <var-icon name="check" />
     </var-button>
-    <var-button type="warning" round>
+    <var-button type="warning" round icon-container>
       <var-icon name="warning" />
     </var-button>
-    <var-button type="danger" round>
+    <var-button type="danger" round icon-container>
       <var-icon name="window-close" />
     </var-button>
   </var-space>
@@ -336,6 +336,7 @@ function handleAutoLoadingClick() {
 | `outline`        | 是否使用外边框                                                         | _boolean_ | `false`        |
 | `disabled`       | 禁用状态                                                            | _boolean_ | `false`        |
 | `ripple`         | 是否使用水波纹                                                         | _boolean_ | `true`         |
+| `focusable` ***3.3.13***  | 是否可以被聚焦                                                         | _boolean_ | `true`         |
 | `text-color`     | 文字颜色                                                            | _string_ | `-`            |
 | `color`          | 背景颜色                                                            | _string_ | `-`            |
 | `elevation`      | 海拔高度，可选值为 `true`、`false` 和 `0-24` 的等级                                                            | _string \| number \| boolean_ | `true`            |

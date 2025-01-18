@@ -1,11 +1,11 @@
+import { createApp, Fragment, h } from 'vue'
+import { mount } from '@vue/test-utils'
+import { describe, expect, test, vi } from 'vitest'
 import Button from '..'
 import ButtonGroup from '../../button-group'
-import VarButton from '../Button.vue'
 import VarButtonGroup from '../../button-group/ButtonGroup.vue'
-import { mount } from '@vue/test-utils'
-import { createApp, Fragment, h } from 'vue'
 import { delay, trigger } from '../../utils/test'
-import { expect, vi, describe, test } from 'vitest'
+import VarButton from '../Button.vue'
 
 test('test button plugin', () => {
   const app = createApp({}).use(Button)
@@ -240,6 +240,17 @@ describe('test button component props', () => {
     expect(wrapper.find('.var-ripple').exists()).toBe(false)
     expect(onTouchstart).toHaveBeenCalledTimes(0)
 
+    wrapper.unmount()
+  })
+
+  test('test button focusable', () => {
+    const wrapper = mount(VarButton, {
+      props: {
+        focusable: false,
+      },
+    })
+
+    expect(wrapper.html()).toMatchSnapshot()
     wrapper.unmount()
   })
 

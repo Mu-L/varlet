@@ -1,8 +1,7 @@
-import config from '@config'
-import AppType from './appType'
-import { Themes, StyleProvider } from '@varlet/ui'
 import { onMounted, onUnmounted } from 'vue'
-import { get } from 'lodash-es'
+import config from '@config'
+import { StyleProvider, Themes } from '@varlet/ui'
+import AppType from './appType'
 
 interface PCLocationInfo {
   language: string
@@ -33,9 +32,9 @@ function getHashSearch() {
 }
 
 export function getBrowserTheme(): Theme {
-  const themeKey = get(config, 'themeKey')
-  const defaultLightTheme = get(config, 'defaultLightTheme')
-  const defaultDarkTheme = get(config, 'defaultDarkTheme')
+  const themeKey = config?.themeKey
+  const defaultLightTheme = config?.defaultLightTheme
+  const defaultDarkTheme = config?.defaultDarkTheme
   const storageTheme = window.localStorage.getItem(themeKey) as Theme
 
   if (!storageTheme) {
@@ -52,7 +51,7 @@ export function getBrowserTheme(): Theme {
 
 export function watchLang(cb: (lang: string) => void, platform: 'pc' | 'mobile' = 'mobile') {
   const handleHashchange = () => {
-    const language = platform === 'mobile' ? getHashSearch().get('language') ?? 'zh-CN' : getPCLocationInfo().language
+    const language = platform === 'mobile' ? (getHashSearch().get('language') ?? 'zh-CN') : getPCLocationInfo().language
     cb(language)
   }
 
@@ -96,7 +95,7 @@ const themeMap = {
 }
 
 export function setTheme(theme: Theme) {
-  const siteStyleVars = withSiteConfigNamespace(get(config, theme, {}))
+  const siteStyleVars = withSiteConfigNamespace(config[theme] || {})
   const styleVars = { ...siteStyleVars, ...(themeMap[theme] ?? {}) }
   StyleProvider(styleVars)
   setColorScheme(theme)
@@ -110,7 +109,7 @@ export function onThemeChange(cb?: (theme: Theme) => void) {
 }
 
 export function getSiteStyleVars(theme: Theme) {
-  return withSiteConfigNamespace(get(config, theme, {}))
+  return withSiteConfigNamespace(config[theme] || {})
 }
 
 export function setColorScheme(theme: Theme) {
@@ -119,7 +118,7 @@ export function setColorScheme(theme: Theme) {
 
 export function watchTheme(
   cb: (theme: Theme, from: 'pc' | 'mobile' | 'default' | 'playground') => void,
-  shouldUnmount = true
+  shouldUnmount = true,
 ) {
   const handleThemeChange = (event: MessageEvent) => {
     const { data } = event
@@ -137,6 +136,11 @@ export function watchTheme(
   }
 
   cb(getBrowserTheme(), 'default')
+}
+
+export function getMobileIndex() {
+  const isCf = config._cf.some((path: string) => window.location.origin.includes(path))
+  return isCf ? './mobile' : './mobile.html'
 }
 
 export { AppType, StyleProvider }

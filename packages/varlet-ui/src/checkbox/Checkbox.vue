@@ -1,46 +1,31 @@
 <template>
-  <div :class="n('wrap')" @click="handleClick">
-    <div :class="n()">
+  <div :class="n('wrap')">
+    <div :class="n()" @click="handleClick">
       <div
         ref="action"
+        v-hover:desktop="handleHovering"
+        v-ripple="{ disabled: formReadonly || readonly || formDisabled || disabled || !ripple }"
         :class="
           classes(
             n('action'),
             [checked || isIndeterminate, n('--checked'), n('--unchecked')],
             [errorMessage || checkboxGroupErrorMessage, n('--error')],
-            [formDisabled || disabled, n('--disabled')]
+            [formDisabled || disabled, n('--disabled')],
           )
         "
         :style="{ color: checked || isIndeterminate ? checkedColor : uncheckedColor }"
         :tabindex="disabled || formDisabled ? undefined : '0'"
-        v-hover:desktop="handleHovering"
-        v-ripple="{ disabled: formReadonly || readonly || formDisabled || disabled || !ripple }"
         @focus="isFocusing = true"
         @blur="isFocusing = false"
       >
-        <slot name="indeterminate-icon" v-if="isIndeterminate">
-          <var-icon
-            :class="classes(n('icon'), [withAnimation, n('--with-animation')])"
-            name="minus-box"
-            :size="iconSize"
-            var-checkbox-cover
-          />
+        <slot v-if="isIndeterminate" name="indeterminate-icon">
+          <var-icon :class="n('icon')" name="minus-box" :size="iconSize" var-checkbox-cover />
         </slot>
-        <slot name="checked-icon" v-if="checked && !isIndeterminate">
-          <var-icon
-            :class="classes(n('icon'), [withAnimation, n('--with-animation')])"
-            name="checkbox-marked"
-            :size="iconSize"
-            var-checkbox-cover
-          />
+        <slot v-if="checked && !isIndeterminate" name="checked-icon">
+          <var-icon :class="n('icon')" name="checkbox-marked" :size="iconSize" var-checkbox-cover />
         </slot>
-        <slot name="unchecked-icon" v-if="!checked && !isIndeterminate">
-          <var-icon
-            :class="classes(n('icon'), [withAnimation, n('--with-animation')])"
-            name="checkbox-blank-outline"
-            :size="iconSize"
-            var-checkbox-cover
-          />
+        <slot v-if="!checked && !isIndeterminate" name="unchecked-icon">
+          <var-icon :class="n('icon')" name="checkbox-blank-outline" :size="iconSize" var-checkbox-cover />
         </slot>
         <var-hover-overlay
           :hovering="!disabled && !formDisabled && hovering"
@@ -49,17 +34,17 @@
       </div>
 
       <div
+        v-if="$slots.default"
         :class="
           classes(
             n('text'),
             [errorMessage || checkboxGroupErrorMessage, n('--error')],
-            [formDisabled || disabled, n('--disabled')]
+            [formDisabled || disabled, n('--disabled')],
           )
         "
-        v-if="$slots.default"
         @click="handleTextClick"
       >
-        <slot />
+        <slot :checked="checked" />
       </div>
     </div>
 
@@ -68,18 +53,18 @@
 </template>
 
 <script lang="ts">
-import VarIcon from '../icon'
-import VarFormDetails from '../form-details'
-import Ripple from '../ripple'
-import Hover from '../hover'
-import VarHoverOverlay, { useHoverOverlay } from '../hover-overlay'
-import { defineComponent, ref, computed, nextTick } from 'vue'
-import { props, type ValidateTriggers } from './props'
-import { useValidation, createNamespace } from '../utils/components'
-import { useCheckboxGroup, type CheckboxProvider } from './provide'
-import { useForm } from '../form/provide'
+import { computed, defineComponent, nextTick, ref } from 'vue'
 import { call, preventDefault } from '@varlet/shared'
 import { useEventListener, useVModel } from '@varlet/use'
+import VarFormDetails from '../form-details'
+import { useForm } from '../form/provide'
+import Hover from '../hover'
+import VarHoverOverlay, { useHoverOverlay } from '../hover-overlay'
+import VarIcon from '../icon'
+import Ripple from '../ripple'
+import { createNamespace, useValidation } from '../utils/components'
+import { props, type CheckboxValidateTrigger } from './props'
+import { useCheckboxGroup, type CheckboxProvider } from './provide'
 
 const { name, n, classes } = createNamespace('checkbox')
 
@@ -99,7 +84,6 @@ export default defineComponent({
     const isIndeterminate = useVModel(props, 'indeterminate')
     const checked = computed(() => value.value === props.checkedValue)
     const checkedValue = computed(() => props.checkedValue)
-    const withAnimation = ref(false)
     const { checkboxGroup, bindCheckboxGroup } = useCheckboxGroup()
     const { hovering, handleHovering } = useHoverOverlay()
     const { form, bindForm } = useForm()
@@ -118,7 +102,6 @@ export default defineComponent({
       validate,
       resetValidation,
       reset,
-      resetWithAnimation,
     }
 
     call(bindCheckboxGroup, checkboxProvider)
@@ -127,7 +110,7 @@ export default defineComponent({
     useEventListener(() => window, 'keydown', handleKeydown)
     useEventListener(() => window, 'keyup', handleKeyup)
 
-    function validateWithTrigger(trigger: ValidateTriggers) {
+    function validateWithTrigger(trigger: CheckboxValidateTrigger) {
       nextTick(() => {
         const { validateTrigger, rules, modelValue } = props
         vt(validateTrigger, trigger, rules, modelValue)
@@ -138,9 +121,7 @@ export default defineComponent({
       const { checkedValue, onChange } = props
 
       value.value = changedValue
-      isIndeterminate.value = false
-
-      call(onChange, value.value)
+      call(onChange, value.value, isIndeterminate.value)
       validateWithTrigger('onChange')
       changedValue === checkedValue ? checkboxGroup?.onChecked(checkedValue) : checkboxGroup?.onUnchecked(checkedValue)
     }
@@ -158,7 +139,13 @@ export default defineComponent({
         return
       }
 
-      withAnimation.value = true
+      if (isIndeterminate.value === true) {
+        isIndeterminate.value = false
+        call(props.onChange, value.value, isIndeterminate.value)
+        validateWithTrigger('onChange')
+        return
+      }
+
       const maximum = checkboxGroup ? checkboxGroup.checkedCount.value >= Number(checkboxGroup.max.value) : false
 
       if (!checked.value && maximum) {
@@ -175,10 +162,6 @@ export default defineComponent({
     function sync(values: Array<any>) {
       const { checkedValue, uncheckedValue } = props
       value.value = values.includes(checkedValue) ? checkedValue : uncheckedValue
-    }
-
-    function resetWithAnimation() {
-      withAnimation.value = false
     }
 
     // expose
@@ -235,7 +218,6 @@ export default defineComponent({
       action,
       isFocusing,
       isIndeterminate,
-      withAnimation,
       checked,
       errorMessage,
       checkboxGroupErrorMessage: checkboxGroup?.errorMessage,

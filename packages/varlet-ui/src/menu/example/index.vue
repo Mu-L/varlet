@@ -1,7 +1,7 @@
 <script setup>
-import { Snackbar } from '@varlet/ui'
-import { AppType, watchLang, onThemeChange } from '@varlet/cli/client'
 import { ref } from 'vue'
+import { AppType, onThemeChange, watchLang } from '@varlet/cli/client'
+import { Snackbar } from '@varlet/ui'
 import { t, use } from './locale/index'
 
 const show = ref(false)
@@ -30,12 +30,12 @@ const placementOptions = ref([
   'cover-right',
 ])
 
+watchLang(use)
+onThemeChange()
+
 function closeMenu() {
   show.value = false
 }
-
-watchLang(use)
-onThemeChange()
 </script>
 
 <template>
@@ -50,7 +50,7 @@ onThemeChange()
   </var-menu>
 
   <app-type>{{ t('placement') }}</app-type>
-  <var-select :hint="false" v-model="placementValue">
+  <var-select v-model="placementValue" :hint="false">
     <var-option v-for="(item, index) in placementOptions" :key="index" :label="item" />
   </var-select>
   <div class="placement-container">
@@ -88,7 +88,7 @@ onThemeChange()
   </var-menu>
 
   <app-type>{{ t('trigger') }}</app-type>
-  <var-select :hint="false" v-model="trigger">
+  <var-select v-model="trigger" :hint="false">
     <var-option label="click" />
     <var-option label="hover" />
   </var-select>
@@ -104,10 +104,10 @@ onThemeChange()
 
   <app-type>{{ t('events') }}</app-type>
   <var-menu
-    @open="() => Snackbar.info('open')"
-    @opened="() => Snackbar.success('opened')"
-    @close="() => Snackbar.warning('close')"
-    @closed="() => Snackbar.error('closed')"
+    @open="Snackbar.info('open')"
+    @opened="Snackbar.success('opened')"
+    @close="Snackbar.warning('close')"
+    @closed="Snackbar.error('closed')"
   >
     <var-button type="primary">{{ t('events') }}</var-button>
 
@@ -119,17 +119,15 @@ onThemeChange()
   </var-menu>
 
   <app-type>{{ t('disabled') }}</app-type>
-  <var-space justify="space-between">
-    <var-menu disabled>
-      <var-button type="primary" disabled>{{ t('disabled') }}</var-button>
+  <var-menu disabled>
+    <var-button type="primary" disabled>{{ t('disabled') }}</var-button>
 
-      <template #menu>
-        <var-cell>{{ t('menuOption') }}</var-cell>
-        <var-cell>{{ t('menuOption') }}</var-cell>
-        <var-cell>{{ t('menuOption') }}</var-cell>
-      </template>
-    </var-menu>
-  </var-space>
+    <template #menu>
+      <var-cell>{{ t('menuOption') }}</var-cell>
+      <var-cell>{{ t('menuOption') }}</var-cell>
+      <var-cell>{{ t('menuOption') }}</var-cell>
+    </template>
+  </var-menu>
 
   <app-type>{{ t('twoWayBinding') }}</app-type>
   <var-menu v-model:show="show">

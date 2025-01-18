@@ -1,25 +1,26 @@
-import fse from 'fs-extra'
-import hash from 'hash-sum'
 import { parse, resolve } from 'path'
 import {
-  parse as parseSFC,
-  compileTemplate,
-  compileStyle,
   compileScript as compileScriptSFC,
+  compileStyle,
+  compileTemplate,
+  parse as parseSFC,
   registerTS,
 } from '@vue/compiler-sfc'
-import { replaceExt, smartAppendFileSync } from '../shared/fsUtils.js'
-import { SRC_DIR, ES_DIR } from '../shared/constant.js'
-import { compileScript, getScriptExtname } from './compileScript.js'
+import type { SFCStyleBlock } from '@vue/compiler-sfc'
+import fse from 'fs-extra'
+import hash from 'hash-sum'
 import ts from 'typescript'
+import { ES_DIR, SRC_DIR } from '../shared/constant.js'
+import { replaceExt, smartAppendFileSync } from '../shared/fsUtils.js'
+import { compileScript, getScriptExtname } from './compileScript.js'
 import {
-  clearEmptyLine,
   compileLess,
+  compileScss,
+  compressCss,
   extractStyleDependencies,
   normalizeStyleDependency,
   STYLE_IMPORT_RE,
 } from './compileStyle.js'
-import type { SFCStyleBlock } from '@vue/compiler-sfc'
 
 const { readFile, existsSync, readFileSync, writeFileSync } = fse
 
@@ -134,11 +135,15 @@ export async function compileSFC(sfc: string) {
     })
 
     code = extractStyleDependencies(file, code, STYLE_IMPORT_RE)
-    writeFileSync(file, clearEmptyLine(code), 'utf-8')
+    writeFileSync(file, compressCss(code), 'utf-8')
     smartAppendFileSync(cssFile, `import '${dependencyPath}.css'\n`)
 
     if (style.lang === 'less') {
       await compileLess(file)
+    }
+
+    if (style.lang === 'scss') {
+      compileScss(file)
     }
   }
 }

@@ -1,5 +1,5 @@
-import { VarComponent, BasicAttributes, ListenerProp, SetPropsDefaults } from './varComponent'
-import { VNode, TeleportProps } from 'vue'
+import { TeleportProps, VNode } from 'vue'
+import { BasicAttributes, ListenerProp, SetPropsDefaults, VarComponent } from './varComponent'
 
 export declare const popupProps: Record<keyof PopupProps, any>
 
@@ -17,6 +17,7 @@ export interface PopupProps extends BasicAttributes {
   defaultStyle?: boolean
   safeArea?: boolean
   safeAreaTop?: boolean
+  zIndex?: number
   teleport?: TeleportProps['to'] | false
   onOpen?: ListenerProp<() => void>
   onOpened?: ListenerProp<() => void>

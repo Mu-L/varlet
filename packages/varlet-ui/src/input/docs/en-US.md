@@ -9,6 +9,7 @@ The behavior of the input box is consistent with the basic content, and the user
 ```html
 <script setup>
 import { ref } from 'vue'
+import { z } from 'zod'
 
 const value = ref('')
 const value2 = ref('')
@@ -21,11 +22,15 @@ const value8 = ref('')
 const value9 = ref('')
 const value10 = ref('')
 const value11 = ref('')
+const value12 = ref('')
+const value13 = ref('')
+const value14 = ref('')
 </script>
 
 <template>
   <var-space direction="column" size="large">
     <var-input placeholder="Please enter text" v-model="value" />
+    <var-input placeholder="Please enter number" type="number" v-model="value13" />
     <var-input placeholder="Readonly" readonly v-model="value2" />
     <var-input placeholder="Disabled" disabled v-model="value3" />
     <var-input placeholder="Clearable" clearable v-model="value4" />
@@ -36,8 +41,13 @@ const value11 = ref('')
     </var-input>
     <var-input
       placeholder="Validate"
-      :rules="[(v) => v.length > 6 || 'Text length must be greater than 6']"
+      :rules="(v) => v.length > 6 || 'Text length must be greater than 6'"
       v-model="value6"
+    />
+    <var-input
+      placeholder="Validate With Zod"
+      :rules="z.string().min(7, 'Text length must be greater than 6')"
+      v-model="value14"
     />
     <var-input placeholder="Display Icon" v-model="value7">
       <template #prepend-icon>
@@ -58,6 +68,7 @@ const value11 = ref('')
     <var-input placeholder="Maxlength" :maxlength="10" v-model="value9" />
     <var-input placeholder="Textarea" textarea v-model="value10" />
     <var-input placeholder="Small Size" size="small" v-model="value11" />
+    <var-input placeholder="Removes whitespace from both ends of this string" v-model.trim="value12" />
   </var-space>
 </template>
 
@@ -77,6 +88,7 @@ const value11 = ref('')
 ```html
 <script setup>
 import { ref } from 'vue'
+import { z } from 'zod'
 
 const value = ref('')
 const value2 = ref('')
@@ -89,11 +101,15 @@ const value8 = ref('')
 const value9 = ref('')
 const value10 = ref('')
 const value11 = ref('')
+const value12 = ref('')
+const value13 = ref('')
+const value14 = ref('')
 </script>
 
 <template>
   <var-space direction="column" size="large">
     <var-input variant="outlined" placeholder="Please enter text" v-model="value" />
+    <var-input variant="outlined" placeholder="Please enter number" type="number" v-model="value13" />
     <var-input variant="outlined" placeholder="Readonly" readonly v-model="value2" />
     <var-input variant="outlined" placeholder="Disabled" disabled v-model="value3" />
     <var-input variant="outlined" placeholder="Clearable" clearable v-model="value4" />
@@ -105,8 +121,14 @@ const value11 = ref('')
     <var-input
       variant="outlined"
       placeholder="Validate"
-      :rules="[(v) => v.length > 6 || 'Text length must be greater than 6']"
+      :rules="(v) => v.length > 6 || 'Text length must be greater than 6'"
       v-model="value6"
+    />
+    <var-input
+      variant="outlined"
+      placeholder="validate With Zod"
+      :rules="z.string().min(7, 'Text length must be greater than 6')"
+      v-model="value14"
     />
     <var-input variant="outlined" placeholder="Display Icon" v-model="value7">
       <template #prepend-icon>
@@ -131,6 +153,7 @@ const value11 = ref('')
     <var-input variant="outlined" placeholder="Maxlength" :maxlength="10" v-model="value9" />
     <var-input variant="outlined" placeholder="Textarea" textarea v-model="value10" />
     <var-input variant="outlined" placeholder="Small Size" size="small" v-model="value11" />
+    <var-input variant="outlined" placeholder="Removes whitespace from both ends of this string" v-model.trim="value12" />
   </var-space>
 </template>
 
@@ -149,11 +172,11 @@ const value11 = ref('')
 
 ### Props
 
-| Prop | Description                                                                                                                            | Type | Default | 
-| --- |----------------------------------------------------------------------------------------------------------------------------------------| --- | --- | 
+| Prop | Description                                                                                                                            | Type | Default |
+| --- |----------------------------------------------------------------------------------------------------------------------------------------| --- | --- |
 | `v-model` | The value of the binding                                                                                                               | _string_ | `-` |
 | `placeholder` | placeholder                                                                                                                            | _string_ | `-` |
-| `type` | Input type, The optional value is `text` `password` `number` `tel`                                                                     | _string_ | `text` |
+| `type` | Input type, The optional value is `text` `password` `number` `tel`                                                            | _string_ | `text` |
 | `size` | Input size, The optional value is `normal` `small`                                                          | _string_ | `normal` |
 | `variant` | Input variants, The optional value is `standard` `outlined`                                      | _string_ | `standard` |
 | `maxlength` | Maxlength                                                                                                                              | _string \| number_ | `-` |
@@ -169,9 +192,10 @@ const value11 = ref('')
 | `clearable` | Whether the clearable                                                                                                                  | _boolean_ | `false` |
 | `resize` | Whether textarea can be dragged to resize                                                                                              | _boolean_ | `false` |
 | `autofocus` | Whether the autofocus                                                                                                                  | _boolean_ | `false` |
-| `validate-trigger` | Timing to trigger validation, The optional value is `onFocus` `onBlur` `onChange` `onClick` `onClear` `onInput`                        | _ValidateTriggers[]_ | `['onInput', 'onClear']` |
-| `rules` | The validation rules, return `true` to indicate that the validation passed,The remaining values are converted to text as user prompts | _Array<(v: string) => any>_ | `-` |
+| `validate-trigger` | Timing to trigger validation, The optional value is `onFocus` `onBlur` `onChange` `onClick` `onClear` `onInput`                        | _InputValidateTrigger[]_ | `['onInput', 'onClear']` |
+| `rules` | Validation rules, return `true` to indicate verification passes, other types of values ​​will be converted into text as user prompts. [Zod validation](#/en-US/zodValidation) is supported since `3.5.0` | _((v: string) => any) \| ZodType \| Array<((v: string) => any) \| ZodType>_ | `-` |
 | `enterkeyhint` | Customize the enter key style, See [MDN](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/enterkeyhint) | _string_ | `-` |
+| `aria-label` ***3.8.4*** | See [MDN](https://developer.mozilla.org/zh-CN/docs/Web/Accessibility/ARIA/Attributes/aria-label) | _string_ | `-` |
 
 ### Methods
 
@@ -204,6 +228,7 @@ const value11 = ref('')
 | `extra-message` | Extra message | `-` |
 
 ### Style Variables
+
 Here are the CSS variables used by the component. Styles can be customized using [StyleProvider](#/en-US/style-provider).
 
 | Variable | Default |

@@ -110,7 +110,7 @@ const placementOptions = [
 
 ```html
 <template>
-  <var-tooltip content="Tooltip" color="#d81b60">
+  <var-tooltip content="Tooltip" color="#d81b60" text-color="#fff">
     <var-button type="primary">自定义颜色</var-button>
   </var-tooltip>
 </template>
@@ -167,7 +167,7 @@ import { Snackbar } from '@varlet/ui'
 ```html
 <template>
   <var-tooltip content="Tooltip" disabled>
-    <var-button type="primary" disabled>禁用提示</var-button>
+    <var-button type="primary">禁用提示</var-button>
   </var-tooltip>
 </template>
 ```
@@ -181,6 +181,7 @@ import { Snackbar } from '@varlet/ui'
 | `v-model:show` | 是否显示 | _boolean_       | `false`   |
 | `content` | 显示的内容 | _string_    | `-`       |
 | `color` | 背景颜色 | _string_       | `-`       |
+| `text-color` ***3.5.0*** | 文字颜色 | _string_       | `-`       |
 | `type`  | 类型，可选值为 `default` `primary` `info` `success` `warning` `danger` | _string_  | `default` |
 | `placement` | 弹出位置 | _Placement_    | `bottom`     |
 | `strategy`  | 定位方式，可选值为 `absolute` `fixed` | _string_    | `absolute`    |
@@ -189,8 +190,8 @@ import { Snackbar } from '@varlet/ui'
 | `teleport` | 挂载的位置 | _TeleportProps['to'] \| false_ | `body`    |
 | `same-width` | 是否与触发元素同宽 | _boolean_ | `false`  |
 | `disabled` | 是否禁用 Tooltip | _boolean_      | `false`   |
-| `trigger` | 触发方式，可选值为 `click` `hover`, `click` 为点击时触发, `hover` 为悬停时触发 | _string_       | `hover`   |
-| `reference`       | 关联的触发元素选择器，用于指定特定子元素为触发元素 | _string_              | `-`           |
+| `trigger` | 触发方式，可选值为 `click` `hover` `manual` | _string_       | `hover`   |
+| `reference`       | 菜单关联的触发元素，`string` 类型为菜单组件的子孙元素选择器，`HTMLElement` 类型为任意指定的元素节点 | _string \| HTMLElement_ | `-`           |
 | `close-on-click-reference` | 是否在点击菜单触发元素后关闭菜单 | _boolean_ | `false` |
 | `close-on-key-escape` | 是否支持键盘 ESC 关闭提示 | _boolean_ | `true`  |
 
@@ -218,6 +219,7 @@ import { Snackbar } from '@varlet/ui'
 | `open` | 打开 `Tooltip` | `-` | `-` |
 | `close` | 关闭 `Tooltip` | `-` | `-` |
 | `resize` | `Tooltip` 默认插槽元素产生位置大小变化时可以调用此方法进行重绘 | `-` | `-` |
+| `setReference` ***3.7.2*** | 设置 `Tooltip` 关联的触发元素 | `reference: 与组件属性的 reference 一致` | `-` |
 
 ### 事件
 

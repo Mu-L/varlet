@@ -1,9 +1,9 @@
 <script setup>
-import area from '../../../json/area.json'
-import { Snackbar, Picker } from '@varlet/ui'
-import { AppType, watchLang, onThemeChange } from '@varlet/cli/client'
 import { ref } from 'vue'
-import { use, t } from './locale'
+import { AppType, onThemeChange, watchLang } from '@varlet/cli/client'
+import { Picker, Snackbar } from '@varlet/ui'
+import area from '../../../json/area.json'
+import { t, use } from './locale'
 
 const VarPicker = Picker.Component
 
@@ -121,6 +121,17 @@ async function picker5() {
   })
 }
 
+async function picker6() {
+  await Picker({
+    columns: columns4,
+    cascade: true,
+    columnsCount: 2,
+    onChange(values, indexes) {
+      Snackbar(`values: ${values.toString()}, indexes: ${indexes.toString()}`)
+    },
+  })
+}
+
 function handleChange(values, indexes) {
   Snackbar(`values: ${values.toString()}, indexes: ${indexes.toString()}`)
 }
@@ -133,6 +144,7 @@ function handleChange(values, indexes) {
     <var-button type="primary" block @click="picker2">{{ t('multiplePicker') }}</var-button>
     <var-button type="primary" block @click="picker3">{{ t('cascadePicker') }}</var-button>
     <var-button type="primary" block @click="picker4">{{ t('areaPicker') }}</var-button>
+    <var-button type="primary" block @click="picker6">{{ t('columnsCount') }}</var-button>
     <var-button type="primary" block @click="picker5">{{ t('valueMapping') }}</var-button>
   </var-space>
 
@@ -150,12 +162,15 @@ function handleChange(values, indexes) {
   <app-type>{{ t('areaPicker') }}</app-type>
   <var-picker :columns="columns4" cascade @change="handleChange" />
 
+  <app-type>{{ t('columnsCount') }}</app-type>
+  <var-picker :columns="columns4" cascade :columns-count="2" @change="handleChange" />
+
   <app-type>{{ t('valueMapping') }}</app-type>
   <var-picker :columns="columns5" @change="handleChange" />
 
   <app-type>{{ t('twoWayBinding') }}</app-type>
   <var-space direction="column" size="large">
     <var-button type="primary" @click="values = ['A', 'B', 'C']">values: {{ values }} {{ t('reset') }}</var-button>
-    <var-picker :columns="columns2" v-model="values" @change="handleChange" />
+    <var-picker v-model="values" :columns="columns2" @change="handleChange" />
   </var-space>
 </template>

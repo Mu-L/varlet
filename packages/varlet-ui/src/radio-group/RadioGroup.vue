@@ -1,6 +1,18 @@
 <template>
   <div :class="n('wrap')">
     <div :class="classes(n(), n(`--${direction}`))">
+      <template v-if="options.length">
+        <var-radio
+          v-for="option in options"
+          :key="option[valueKey]"
+          :checked-value="option[valueKey]"
+          :disabled="option.disabled"
+        >
+          <template #default="{ checked }">
+            <maybe-v-node :is="isFunction(option[labelKey]) ? option[labelKey](option, checked) : option[labelKey]" />
+          </template>
+        </var-radio>
+      </template>
       <slot />
     </div>
 
@@ -9,20 +21,21 @@
 </template>
 
 <script lang="ts">
-import VarFormDetails from '../form-details'
 import { computed, defineComponent, nextTick, watch } from 'vue'
-import { props, type ValidateTriggers } from './props'
-import { useValidation, createNamespace } from '../utils/components'
-import { useRadios, type RadioGroupProvider } from './provide'
-import { useForm } from '../form/provide'
-import { call, preventDefault } from '@varlet/shared'
+import { call, isFunction, preventDefault } from '@varlet/shared'
 import { useEventListener } from '@varlet/use'
+import VarFormDetails from '../form-details'
+import { useForm } from '../form/provide'
+import VarRadio from '../radio'
+import { createNamespace, MaybeVNode, useValidation } from '../utils/components'
+import { props, type RadioGroupValidateTrigger } from './props'
+import { useRadios, type RadioGroupProvider } from './provide'
 
 const { name, n, classes } = createNamespace('radio-group')
 
 export default defineComponent({
   name,
-  components: { VarFormDetails },
+  components: { VarFormDetails, VarRadio, MaybeVNode },
   props,
   setup(props) {
     const { length, radios, bindRadios } = useRadios()
@@ -78,7 +91,9 @@ export default defineComponent({
     }
 
     function moveRadio(fromIndex: number, method: 'prev' | 'next') {
-      while (true) {
+      const looping = true
+
+      while (looping) {
         if (method === 'prev') {
           fromIndex--
         } else {
@@ -101,7 +116,7 @@ export default defineComponent({
       }
     }
 
-    function validateWithTrigger(trigger: ValidateTriggers) {
+    function validateWithTrigger(trigger: RadioGroupValidateTrigger) {
       nextTick(() => {
         const { validateTrigger, rules, modelValue } = props
         vt(validateTrigger, trigger, rules, modelValue)
@@ -136,6 +151,7 @@ export default defineComponent({
       reset,
       validate,
       resetValidation,
+      isFunction,
     }
   },
 })
@@ -144,5 +160,9 @@ export default defineComponent({
 <style lang="less">
 @import '../styles/common';
 @import '../form-details/formDetails';
+@import '../ripple/ripple';
+@import '../hover-overlay/hoverOverlay';
+@import '../icon/icon';
+@import '../radio/radio';
 @import './radioGroup';
 </style>

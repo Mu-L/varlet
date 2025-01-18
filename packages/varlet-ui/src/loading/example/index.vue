@@ -12,7 +12,7 @@ onThemeChange()
 <template>
   <app-type>{{ t('type') }}</app-type>
   <var-space align="center" justify="space-between">
-    <var-loading type="circle" />
+    <var-loading />
     <var-loading type="cube" />
     <var-loading type="wave" />
     <var-loading type="rect" />
@@ -21,7 +21,7 @@ onThemeChange()
 
   <app-type>{{ t('color') }}</app-type>
   <var-space align="center" justify="space-between">
-    <var-loading type="circle" color="var(--color-info)" />
+    <var-loading color="var(--color-info)" />
     <var-loading type="cube" color="var(--color-success)" />
     <var-loading type="wave" color="var(--color-warning)" />
     <var-loading type="rect" color="var(--color-danger)" />
@@ -30,7 +30,7 @@ onThemeChange()
 
   <app-type>{{ t('size') }}</app-type>
   <var-space align="center" justify="space-between">
-    <var-loading type="circle" size="small" />
+    <var-loading size="small" />
     <var-loading type="cube" size="small" />
     <var-loading type="wave" size="small" />
     <var-loading type="rect" size="small" />
@@ -38,7 +38,7 @@ onThemeChange()
   </var-space>
 
   <app-type>{{ t('wrap') }}</app-type>
-  <var-button @click="loading = !loading" style="margin-bottom: 8px">
+  <var-button style="margin-bottom: 8px" @click="loading = !loading">
     {{ loading ? t('close') : t('open') }}
   </var-button>
   <var-loading description="LOADING" :loading="loading">

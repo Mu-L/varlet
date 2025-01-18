@@ -1,5 +1,5 @@
-import { VarComponent, BasicAttributes, ListenerProp, SetPropsDefaults } from './varComponent'
-import { VNode, InputHTMLAttributes } from 'vue'
+import { InputHTMLAttributes, VNode } from 'vue'
+import { BasicAttributes, ListenerProp, SetPropsDefaults, Rules as UploaderRules, VarComponent } from './varComponent'
 
 export declare const uploaderProps: Record<keyof UploaderProps, any>
 
@@ -47,7 +47,7 @@ export interface UploaderProps extends BasicAttributes {
   preventDefaultPreview?: boolean
   resolveType?: UploaderResolveType
   validateTrigger?: Array<UploaderValidateTrigger>
-  rules?: Array<(v: VarFile[], u: UploaderVarFileUtils) => any>
+  rules?: UploaderRules
   onClickAction?: ListenerProp<(chooseFile: () => void, event: Event) => void>
   onBeforeFilter?: ListenerProp<(files: VarFile[]) => Promise<VarFile[]> | VarFile[]>
   onBeforeRead?: ListenerProp<(file: VarFile) => Promise<any> | any>
@@ -67,6 +67,7 @@ export class Uploader extends VarComponent {
   $slots: {
     default(): VNode[]
     'extra-message'(): VNode[]
+    'remove-button'(remove: () => void): VNode[]
   }
 
   getLoading(): VarFile[]

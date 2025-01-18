@@ -1,9 +1,9 @@
 <template>
   <div :class="classes(n(direction), n('$--box'))">
     <div
-      :class="classes(n(`${direction}-block`), [isDisabled, n('--disabled')], [errorMessage, n(`${direction}--error`)])"
       ref="sliderEl"
-      @click="click"
+      :class="classes(n(`${direction}-block`), [isDisabled, n('--disabled')], [errorMessage, n(`${direction}--error`)])"
+      @click="handleClick"
     >
       <div :class="n(`${direction}-track`)">
         <div
@@ -18,21 +18,27 @@
       </div>
       <div
         v-for="item in thumbList"
-        :class="n(`${direction}-thumb`)"
         :key="item.enumValue"
+        :class="n(`${direction}-thumb`)"
         :style="thumbStyle(item)"
         :tabindex="isDisabled ? undefined : '0'"
+        role="slider"
+        :aria-valuemin="min"
+        :aria-valuemax="max"
+        :aria-valuenow="item.value"
+        :aria-disabled="isDisabled"
+        :aria-valuetext="`${item.text}`"
         @touchstart.stop="start($event, item.enumValue)"
         @focusin="handleFocus(item)"
         @focusout="handleBlur(item)"
       >
         <slot name="button" :current-value="item.text">
           <div
+            v-hover:desktop="(value: boolean) => hover(value, item)"
             :class="n(`${direction}-thumb-block`)"
             :style="{
               background: thumbColor,
             }"
-            v-hover:desktop="(value: boolean) => hover(value, item)"
           ></div>
           <div
             :class="
@@ -68,17 +74,16 @@
 </template>
 
 <script lang="ts">
-import VarFormDetails from '../form-details'
-import VarHoverOverlay, { useHoverOverlay } from '../hover-overlay'
-import Hover from '../hover'
-import { defineComponent, ref, onBeforeUnmount, computed, reactive, nextTick, watch } from 'vue'
-import { useValidation, createNamespace } from '../utils/components'
-import { useForm } from '../form/provide'
-import { getLeft, toSizeUnit } from '../utils/elements'
-import { warn } from '../utils/logger'
-import { isArray, isNumber, toNumber, getRect, preventDefault, call, hasOwn } from '@varlet/shared'
-import { props, Thumbs, type ThumbProps, type ThumbsProps, type ThumbsListProps } from './props'
+import { computed, defineComponent, nextTick, onBeforeUnmount, reactive, ref, watch, type CSSProperties } from 'vue'
+import { call, clamp, error, getRect, hasOwn, isArray, isNumber, preventDefault, toNumber, warn } from '@varlet/shared'
 import { onSmartMounted, onWindowResize, useEventListener } from '@varlet/use'
+import VarFormDetails from '../form-details'
+import { useForm } from '../form/provide'
+import Hover from '../hover'
+import VarHoverOverlay, { useHoverOverlay } from '../hover-overlay'
+import { createNamespace, useValidation } from '../utils/components'
+import { getLeft, toSizeUnit } from '../utils/elements'
+import { props, Thumbs, type ThumbProps, type ThumbsListProps, type ThumbsProps } from './props'
 import { type SliderProvider } from './provide'
 
 const { name, n, classes } = createNamespace('slider')
@@ -107,7 +112,7 @@ export default defineComponent({
     const { hovering: hoveringFirst, handleHovering: handleHoveringFirst } = useHoverOverlay()
     const { hovering: hoveringSecond, handleHovering: handleHoveringSecond } = useHoverOverlay()
 
-    const thumbList = computed<ThumbsListProps[]>(() => {
+    const thumbList = computed(() => {
       const { modelValue, range } = props
       let list: ThumbsListProps[] = []
 
@@ -155,7 +160,7 @@ export default defineComponent({
       return list
     })
 
-    const getFillStyle = computed<Record<string, string | undefined>>(() => {
+    const getFillStyle = computed<CSSProperties>(() => {
       const { activeColor, range, modelValue } = props
 
       const gap = range && isArray(modelValue) ? getValue(Math.min(modelValue[0], modelValue[1])) : 0
@@ -235,7 +240,7 @@ export default defineComponent({
     }
 
     function validateWithTrigger() {
-      return nextTick(() => vt(['onChange'], 'onChange', props.rules, props.modelValue))
+      nextTick(() => vt(['onChange'], 'onChange', props.rules, props.modelValue))
     }
 
     function getOffset(e: MouseEvent) {
@@ -261,7 +266,7 @@ export default defineComponent({
       }
     }
 
-    function showLabel(type: keyof ThumbsProps): boolean {
+    function showLabel(type: keyof ThumbsProps) {
       if (props.labelVisible === 'always') {
         return true
       }
@@ -292,16 +297,7 @@ export default defineComponent({
         return 0
       }
 
-      let num = value
-
-      if (num < Number(props.min)) {
-        num = Number(props.min)
-      }
-
-      if (num > Number(props.max)) {
-        num = Number(props.max)
-      }
-
+      const num = clamp(value, toNumber(props.min), toNumber(props.max))
       const isInteger = parseInt(`${num}`, 10) === num
 
       return isInteger ? num : toNumber(num.toPrecision(5))
@@ -323,7 +319,7 @@ export default defineComponent({
 
     function setPercent(moveDistance: number, type: keyof ThumbsProps) {
       let rangeValue: Array<number> = []
-      const { step, range, modelValue, onChange, min } = props
+      const { step, range, modelValue, min } = props
       const stepNumber = toNumber(step)
       const roundDistance = Math.round(moveDistance / unitWidth.value)
       const curValue = roundDistance * stepNumber + toNumber(min)
@@ -434,9 +430,15 @@ export default defineComponent({
       isScroll.value = false
     }
 
-    function click(event: MouseEvent) {
-      if (isDisabled.value || isReadonly.value) return
-      if ((event.target as HTMLElement).closest(`.${n('thumb')}`)) return
+    function handleClick(event: MouseEvent) {
+      if (isDisabled.value || isReadonly.value) {
+        return
+      }
+
+      if ((event.target as HTMLElement).closest(`.${n('thumb')}`)) {
+        return
+      }
+
       const offset = getOffset(event)
       const type = getType(offset)
       activeThumb = type
@@ -445,14 +447,7 @@ export default defineComponent({
     }
 
     function stepValidator() {
-      const stepNumber = toNumber(props.step)
-
-      if (isNaN(stepNumber)) {
-        warn('Slider', 'type of prop "step" should be Number')
-        return false
-      }
-
-      if (stepNumber < 0) {
+      if (toNumber(props.step) <= 0) {
         warn('Slider', '"step" should be > 0')
         return false
       }
@@ -464,17 +459,17 @@ export default defineComponent({
       const { range, modelValue } = props
 
       if (range && !isArray(modelValue)) {
-        console.error('[Varlet] Slider: "modelValue" should be an Array')
+        error('Slider', '"modelValue" should be an Array')
         return false
       }
 
       if (!range && isArray(modelValue)) {
-        console.error('[Varlet] Slider: "modelValue" should be a Number')
+        error('Slider', '"modelValue" should be a Number')
         return false
       }
 
       if (range && isArray(modelValue) && modelValue.length < 2) {
-        console.error('[Varlet] Slider: "modelValue" should have two value')
+        error('Slider', '"modelValue" should have two value')
         return false
       }
 
@@ -513,7 +508,7 @@ export default defineComponent({
     }
 
     function moveFocusingThumb(offset: 1 | -1, value: number | number[]) {
-      const stepValue = Number(props.step)
+      const stepValue = toNumber(props.step)
 
       if (isArray(value)) {
         const updatedFirstValue = value[0] + (focusingFirst.value ? offset * stepValue : 0)
@@ -567,7 +562,6 @@ export default defineComponent({
     }
 
     return {
-      Thumbs,
       sliderEl,
       getFillStyle,
       isDisabled,
@@ -587,7 +581,7 @@ export default defineComponent({
       start,
       move,
       end,
-      click,
+      handleClick,
     }
   },
 })

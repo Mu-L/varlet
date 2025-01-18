@@ -8,8 +8,8 @@
         classes(
           n('controller'),
           [isFocusing, n('--focus')],
-          [errorMessage, n('--error')],
-          [formDisabled || disabled, n('--disabled')]
+          [isError, n('--error')],
+          [formDisabled || disabled, n('--disabled')],
         )
       "
       :style="{
@@ -38,9 +38,9 @@
             [isFocusing, n('--focus')],
             [hintCenter, n('--hint-center')],
             [formDisabled || disabled, n('--disabled')],
-            [errorMessage, n('--error')],
+            [isError, n('--error')],
             [transitionDisabled, n('--transition-disabled')],
-            computePlaceholderState()
+            computePlaceholderState(),
           )
         "
         :style="{
@@ -52,7 +52,7 @@
       </label>
 
       <div :class="classes(n('icon'), [!hint, n('--icon-non-hint')])">
-        <slot name="clear-icon" v-if="clearable && !isEmpty(value)" :clear="handleClear">
+        <slot v-if="clearable && !isEmpty(value)" name="clear-icon" :clear="handleClear">
           <var-icon :class="n('clear-icon')" var-field-decorator-cover name="close-circle" @click="handleClear" />
         </slot>
         <slot name="append-icon" />
@@ -66,8 +66,8 @@
           classes(
             n('line'),
             [isFocusing, n('--line-focus')],
-            [errorMessage, n('--line-error')],
-            [formDisabled || disabled, n('--line-disabled')]
+            [isError, n('--line-error')],
+            [formDisabled || disabled, n('--line-disabled')],
           )
         "
         :style="{ borderColor: color }"
@@ -76,7 +76,7 @@
           :class="classes(n('line-legend'), [isFloating, n('line-legend--hint')])"
           :style="{ width: legendWidth }"
         >
-          <teleport to="body" v-if="placeholder && hint">
+          <teleport v-if="placeholder && hint" to="body">
             <span
               ref="placeholderTextEl"
               :class="
@@ -89,9 +89,9 @@
       </fieldset>
 
       <div
-        :class="classes(n('line'), [formDisabled || disabled, n('--line-disabled')], [errorMessage, n('--line-error')])"
-        :style="{ background: !errorMessage ? blurColor : undefined }"
         v-else
+        :class="classes(n('line'), [formDisabled || disabled, n('--line-disabled')], [isError, n('--line-error')])"
+        :style="{ background: !isError ? blurColor : undefined }"
       >
         <div
           :class="
@@ -99,10 +99,10 @@
               n('dot'),
               [isFocusing, n('--line-focus')],
               [formDisabled || disabled, n('--line-disabled')],
-              [errorMessage, n('--line-error')]
+              [isError, n('--line-error')],
             )
           "
-          :style="{ background: !errorMessage ? focusColor : undefined }"
+          :style="{ background: !isError ? focusColor : undefined }"
         />
       </div>
     </template>
@@ -110,12 +110,14 @@
 </template>
 
 <script lang="ts">
+import { computed, defineComponent, nextTick, onUpdated, ref, watch } from 'vue'
+import { call, doubleRaf, getStyle, isEmpty } from '@varlet/shared'
+import { onSmartMounted, onWindowResize } from '@varlet/use'
 import VarIcon from '../icon'
-import { defineComponent, ref, computed, nextTick, onUpdated } from 'vue'
-import { props } from './props'
-import { isEmpty, getStyle, call } from '@varlet/shared'
+import { usePopup } from '../popup/provide'
+import { useSwipeResizeDispatcher } from '../swipe/provide'
 import { createNamespace } from '../utils/components'
-import { onWindowResize, onSmartMounted } from '@varlet/use'
+import { props } from './props'
 
 const { name, n, classes } = createNamespace('field-decorator')
 
@@ -132,9 +134,11 @@ export default defineComponent({
     const middleOffsetHeight = ref('0px')
     const transitionDisabled = ref(true)
     const isFloating = computed(() => props.hint && (!isEmpty(props.value) || props.isFocusing))
+    const { popup, bindPopup } = usePopup()
+    const { bindSwipeResizeDispatcher } = useSwipeResizeDispatcher()
 
     const color = computed<string | undefined>(() =>
-      !props.errorMessage ? (props.isFocusing ? props.focusColor : props.blurColor) : undefined
+      !props.isError ? (props.isFocusing ? props.focusColor : props.blurColor) : undefined,
     )
 
     onWindowResize(resize)
@@ -148,6 +152,25 @@ export default defineComponent({
     })
 
     onUpdated(resize)
+
+    call(bindPopup, null)
+    call(bindSwipeResizeDispatcher, {
+      onResize() {
+        nextTick().then(resize)
+      },
+    })
+
+    if (popup) {
+      watch(
+        () => popup.show.value,
+        async (show) => {
+          if (show) {
+            await doubleRaf()
+            resize()
+          }
+        },
+      )
+    }
 
     function computePlaceholderState() {
       const { hint, value, composing } = props

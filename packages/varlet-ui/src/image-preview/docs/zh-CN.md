@@ -13,7 +13,7 @@
 import { ImagePreview } from '@varlet/ui'
 
 function preview() {
-  ImagePreview('https://varlet.gitee.io/varlet-ui/cat.jpg')
+  ImagePreview('https://varletjs.org/cat.jpg')
 }
 </script>
 
@@ -31,8 +31,8 @@ import { ImagePreview, Snackbar } from '@varlet/ui'
 function preview() {
   ImagePreview({
     images: [
-      'https://varlet.gitee.io/varlet-ui/cat.jpg',
-      'https://varlet.gitee.io/varlet-ui/cat2.jpg'
+      'https://varletjs.org/cat.jpg',
+      'https://varletjs.org/cat2.jpg'
     ],
     onChange(index) {
       Snackbar(String(index))
@@ -57,8 +57,8 @@ import { ref } from 'vue'
 
 const show = ref(false)
 const images = ref([
-  'https://varlet.gitee.io/varlet-ui/cat.jpg',
-  'https://varlet.gitee.io/varlet-ui/cat2.jpg',
+  'https://varletjs.org/cat.jpg',
+  'https://varletjs.org/cat2.jpg',
 ])
 </script>
 
@@ -81,8 +81,8 @@ import { ref } from 'vue'
 
 const show = ref(false)
 const images = ref([
-  'https://varlet.gitee.io/varlet-ui/cat.jpg',
-  'https://varlet.gitee.io/varlet-ui/cat2.jpg',
+  'https://varletjs.org/cat.jpg',
+  'https://varletjs.org/cat2.jpg',
 ])
 </script>
 
@@ -110,8 +110,8 @@ import { ref } from 'vue'
 
 const show = ref(false)
 const images = ref([
-  'https://varlet.gitee.io/varlet-ui/cat.jpg',
-  'https://varlet.gitee.io/varlet-ui/cat2.jpg',
+  'https://varletjs.org/cat.jpg',
+  'https://varletjs.org/cat2.jpg',
 ])
 </script>
 
@@ -140,8 +140,8 @@ import { Snackbar } from '@varlet/ui'
 
 const show = ref(false)
 const images = ref([
-  'https://varlet.gitee.io/varlet-ui/cat.jpg',
-  'https://varlet.gitee.io/varlet-ui/cat2.jpg',
+  'https://varletjs.org/cat.jpg',
+  'https://varletjs.org/cat2.jpg',
 ])
 </script>
 
@@ -172,8 +172,8 @@ import { Snackbar } from '@varlet/ui'
 
 const show = ref(false)
 const images = ref([
-  'https://varlet.gitee.io/varlet-ui/cat.jpg',
-  'https://varlet.gitee.io/varlet-ui/cat2.jpg',
+  'https://varletjs.org/cat.jpg',
+  'https://varletjs.org/cat2.jpg',
 ])
 </script>
 
@@ -203,8 +203,8 @@ import { ref } from 'vue'
 const show = ref(false)
 const menuShow = ref(false)
 const images = ref([
-  'https://varlet.gitee.io/varlet-ui/cat.jpg',
-  'https://varlet.gitee.io/varlet-ui/cat2.jpg',
+  'https://varletjs.org/cat.jpg',
+  'https://varletjs.org/cat2.jpg',
 ])
 const actions = [
   {
@@ -245,7 +245,7 @@ const actions = [
 
 | 参数         | 说明   | 类型  | 默认值  |
 | ------------ | ------------ | ------------------ | ------------ |
-| `show`       | 是否显示     | _boolean_ | `false` |
+| `v-model:show` | 是否显示     | _boolean_ | `false` |
 | `images`     | 需要预览的图片 URL 数组 | _string[]_ | `[]` |
 | `initial-index` | 图片预览起始的索引 | _string \| number_ | `0` |
 | `zoom`       | 双击放大倍数 | _string \| number_ | `2` |
